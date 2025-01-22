@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'product.dart'; // Importa la pantalla del producto
+import 'shopping.dart'; // Importa la pantalla del carrito
+import 'profile.dart'; // Importa la pantalla del perfil
 
 class MenuScreen extends StatefulWidget {
   @override
@@ -12,7 +15,6 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Eliminar AppBar
       appBar: null,
       body: SingleChildScrollView(
         child: Column(
@@ -135,17 +137,16 @@ class _MenuScreenState extends State<MenuScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  PlateItem(name: 'Chicharron', price: 's/15.00', time: '30-45 min'),
-                  PlateItem(name: 'Lomo Saltado', price: 's/20.00', time: '20-30 min'),
-                  PlateItem(name: 'Ceviche', price: 's/18.00', time: '15-25 min'),
-                  PlateItem(name: 'Arroz Chaufa', price: 's/12.00', time: '20 min'),
+                  PlateItem(name: 'Chicharron', price: 'S/15.00', time: '30-45 min'),
+                  PlateItem(name: 'Lomo Saltado', price: 'S/20.00', time: '20-30 min'),
+                  PlateItem(name: 'Ceviche', price: 'S/18.00', time: '15-25 min'),
+                  PlateItem(name: 'Arroz Chaufa', price: 'S/12.00', time: '20 min'),
                 ],
               ),
             ),
           ],
         ),
       ),
-      // Menú de navegación inferior
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
@@ -162,7 +163,23 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         ],
         onTap: (index) {
-          // Aquí puedes agregar las acciones para cada ítem
+          if (index == 1) {
+            // Navegar a la pantalla del carrito cuando se seleccione "Carrito"
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ShoppingScreen(), // Navega a la pantalla del carrito
+              ),
+            );
+          } else if (index == 2) {
+            // Navegar a la pantalla del perfil cuando se seleccione "Mi Perfil"
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(), // Navega a la pantalla del perfil
+              ),
+            );
+          }
         },
       ),
     );
@@ -179,26 +196,41 @@ class PlateItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 8.0),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: <Widget>[
-            Icon(Icons.restaurant_menu, size: 40.0),
-            SizedBox(width: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  name,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Text(price),
-                Text('Tiempo: $time'),
-              ],
+    return GestureDetector(
+      onTap: () {
+        // Navegar a la pantalla del producto al hacer clic
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductScreen(
+              name: name,
+              price: price,
+              time: time,
             ),
-          ],
+          ),
+        );
+      },
+      child: Card(
+        margin: EdgeInsets.symmetric(vertical: 8.0),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.restaurant_menu, size: 40.0),
+              SizedBox(width: 16.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    name,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Text(price),
+                  Text('Tiempo: $time'),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
