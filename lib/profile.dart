@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'menu.dart'; // Importa la pantalla de inicio (menú)
 import 'shopping.dart'; // Importa la pantalla del carrito
+import 'main.dart'; // Importa la pantalla principal desde main.dart
 
 class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Removemos el AppBar y usamos un Container vacío
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(0), // Sin altura
         child: Container(), // No tiene contenido
@@ -16,7 +16,7 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // Nombre y celular
+            // Nombre
             Text(
               'Bruno Huarca',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -25,7 +25,7 @@ class ProfileScreen extends StatelessWidget {
               children: <Widget>[
                 Text('Celular: 902311395'),
                 SizedBox(width: 10),
-                ElevatedButton(
+                TextButton(
                   onPressed: () {
                     // Acción para editar
                   },
@@ -45,7 +45,7 @@ class ProfileScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text('Dirección'),
-                ElevatedButton(
+                TextButton(
                   onPressed: () {
                     // Acción para cambiar la dirección
                   },
@@ -61,7 +61,7 @@ class ProfileScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text('Referencia'),
-                ElevatedButton(
+                TextButton(
                   onPressed: () {
                     // Acción para cambiar la referencia
                   },
@@ -69,16 +69,48 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ],
             ),
-            Text('Porton negro'),
+            Text('Portón negro'),
+            Divider(), // Línea de separación
+
+            // Ubicación
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text('Ubicación'),
+                TextButton(
+                  onPressed: () {
+                    // Acción para cambiar la ubicación
+                  },
+                  child: Text('Cambiar'),
+                ),
+              ],
+            ),
+            Text('Latitud: -12.0464, Longitud: -77.0428'),
+            Divider(), // Línea de separación
+
+            // Contraseña (opcional)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text('Contraseña'),
+                TextButton(
+                  onPressed: () {
+                    // Acción para cambiar la contraseña
+                  },
+                  child: Text('Cambiar'),
+                ),
+              ],
+            ),
+            Text('********'), // Texto ocultando la contraseña
             Divider(), // Línea de separación
 
             // Opción de Cerrar sesión
             GestureDetector(
               onTap: () {
-                // Lógica para cerrar sesión, navegar al MenuScreen
+                // Lógica para cerrar sesión y navegar a la pantalla principal (main.dart)
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => MenuScreen()),
+                  MaterialPageRoute(builder: (context) => MyApp()), // Asegúrate de que 'MyApp' sea el widget principal de main.dart
                 );
               },
               child: Text(
@@ -114,21 +146,18 @@ class ProfileScreen extends StatelessWidget {
           // Lógica de navegación para cada opción del bottom navigation
           switch (index) {
             case 0:
-              // Navegar a la pantalla de inicio
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => MenuScreen()),
               );
               break;
             case 1:
-              // Navegar a la pantalla del carrito
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => ShoppingScreen()),
               );
               break;
             case 2:
-              // Ya estamos en la pantalla de perfil, no hacemos nada
               break;
           }
         },
