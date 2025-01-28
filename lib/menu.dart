@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'product.dart'; // Importa la pantalla del producto
-import 'shopping.dart'; // Importa la pantalla del carrito
-import 'profile.dart'; // Importa la pantalla del perfil
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'product_func.dart'; // Importa el modelo Product
+import 'package:permission_handler/permission_handler.dart';
 
 class MenuScreen extends StatefulWidget {
   @override
@@ -10,35 +10,92 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  double _precio = 20; // Precio inicial
-  double _maxPrice = 100; // Precio máximo
-  PageController _pageController = PageController();
-  int _currentPage = 0;
-  Timer? _timer;
+  List<Product> products = []; // Lista de productos
+  List<Product> filteredProducts = []; // Lista filtrada de productos
+  bool isLoading = true;
+  TextEditingController searchController = TextEditingController();
+  
+  // Valores del slider para el precio
+  double minPrice = 5.0;
+  double maxPrice = 30.0;
+  
+  // Rango de precios filtrado
+  double currentMinPrice = 5.0;
+  double currentMaxPrice = 30.0;
 
   @override
   void initState() {
     super.initState();
-    // Configura un temporizador para cambiar las páginas automáticamente
-    _timer = Timer.periodic(Duration(seconds: 3), (Timer timer) {
-      if (_currentPage < 2) {
-        _currentPage++;
+    // Obtener productos desde la API
+    fetchProducts();
+    searchController.addListener(_filterProducts);
+  }
+
+  // Función para hacer la solicitud HTTP
+  Future<void> fetchProducts() async {
+    try {
+      final response = await http.get(Uri.parse('https://mixturarosaaqp.com/api/productos'));
+
+      if (response.statusCode == 200) {
+        // Si la solicitud fue exitosa, parsea los productos
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          products = data.map((item) => Product.fromJson(item)).toList();
+          filteredProducts = products; // Inicializa la lista filtrada con todos los productos
+          isLoading = false; // Cambiar el estado de carga
+        });
       } else {
-        _currentPage = 0;
+        // Si no fue exitosa, muestra un error
+        setState(() {
+          isLoading = false;
+        });
+        throw Exception('Error al cargar productos');
       }
-      _pageController.animateToPage(
-        _currentPage,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+      });
+      // Si ocurrió un error, muestra un mensaje
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text("No se pudieron cargar los productos. Intenta más tarde."),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
       );
+    }
+  }
+
+  // Función para filtrar los productos
+  void _filterProducts() {
+    setState(() {
+      filteredProducts = products
+          .where((product) =>
+              product.name.toLowerCase().contains(searchController.text.toLowerCase()) &&
+              product.price >= currentMinPrice &&
+              product.price <= currentMaxPrice)
+          .toList();
     });
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _pageController.dispose();
-    super.dispose();
+  // Función para actualizar el rango de precios
+  void _updatePriceFilter() {
+    setState(() {
+      filteredProducts = products
+          .where((product) =>
+              product.price >= currentMinPrice && product.price <= currentMaxPrice)
+          .toList();
+    });
   }
 
   @override
@@ -47,200 +104,113 @@ class _MenuScreenState extends State<MenuScreen> {
       appBar: null,
       body: Column(
         children: <Widget>[
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  // Título "RESTAURANT"
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'RESTAURANT',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-                  // Buscador de platos
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Buscar plato...',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.search),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 16.0),
-
-                  // Filtro de precio
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text('Filtrar por precio: S/$_precio'),
-                        Slider(
-                          value: _precio,
-                          min: 0,
-                          max: _maxPrice,
-                          divisions: 10,
-                          label: 'S/$_precio',
-                          onChanged: (value) {
-                            setState(() {
-                              _precio = value;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16.0),
-
-                  // Botón Licorería
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Acción para "Licorería"
-                      },
-                      child: Text('Licorería'),
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 20.0),
-                        textStyle: TextStyle(fontSize: 22),
-                        minimumSize: Size(double.infinity, 50),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 16.0),
-
-                  // Título 'Las mejores ofertas'
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Las mejores ofertas',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-
-                  // Carrusel de imágenes
-                  Container(
-                    height: 200.0,
-                    child: PageView(
-                      controller: _pageController,
-                      children: <Widget>[
-                        Card(
-                          child: Image.asset('assets/offer1.jpg'),
-                        ),
-                        Card(
-                          child: Image.asset('assets/offer2.jpg'),
-                        ),
-                        Card(
-                          child: Image.asset('assets/offer3.jpg'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16.0),
-
-                  // Título 'Todos los platos'
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Todos los platos',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-
-                  // Lista de platos
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        PlateItem(name: 'Chicharron', price: 'S/15.00', time: '30-45 min'),
-                        PlateItem(name: 'Lomo Saltado', price: 'S/20.00', time: '20-30 min'),
-                        PlateItem(name: 'Ceviche', price: 'S/18.00', time: '15-25 min'),
-                        PlateItem(name: 'Arroz Chaufa', price: 'S/12.00', time: '20 min'),
-                      ],
-                    ),
-                  ),
-                ],
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'RESTAURANT',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          // Cuadro de búsqueda
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                labelText: 'Buscar plato...',
+                border: OutlineInputBorder(),
+                suffixIcon: Icon(Icons.search),
               ),
             ),
           ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Inicio',
+          // Filtro de precio con Slider
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Rango de precio: S/ ${currentMinPrice.toStringAsFixed(2)} - S/ ${currentMaxPrice.toStringAsFixed(2)}',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                RangeSlider(
+                  values: RangeValues(currentMinPrice, currentMaxPrice),
+                  min: minPrice,
+                  max: maxPrice,
+                  divisions: 5,
+                  labels: RangeLabels(
+                    'S/ ${currentMinPrice.toStringAsFixed(2)}',
+                    'S/ ${currentMaxPrice.toStringAsFixed(2)}',
+                  ),
+                  onChanged: (RangeValues values) {
+                    setState(() {
+                      currentMinPrice = values.start;
+                      currentMaxPrice = values.end;
+                    });
+                    _updatePriceFilter(); // Aplicar filtro de precio
+                  },
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Carrito',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Mi Perfil',
-          ),
-        ],
-        onTap: (index) {
-          if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ShoppingScreen(),
+          // Título 'Todos los platos'
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Todos los platos',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
-            );
-          } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProfileScreen(),
-              ),
-            );
-          }
-        },
+            ),
+          ),
+          // Si estamos cargando, muestra un indicador de carga
+          isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: filteredProducts.map((product) {
+                        return PlateItem(
+                          name: product.name,
+                          price: 'S/${product.price}',
+                          time: 'N/A', // Puedes añadir un campo 'time' si lo tienes
+                          imageUrl: product.imageUrl,
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+        ],
       ),
     );
   }
 }
 
-// Widget para mostrar los platos
 class PlateItem extends StatelessWidget {
   final String name;
   final String price;
   final String time;
+  final String imageUrl;
 
-  PlateItem({required this.name, required this.price, required this.time});
+  PlateItem({
+    required this.name,
+    required this.price,
+    required this.time,
+    required this.imageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductScreen(
-              name: name,
-              price: price,
-              time: time,
-            ),
-          ),
-        );
+        // Aquí puedes hacer algo cuando el usuario toque un plato
       },
       child: Card(
         margin: EdgeInsets.symmetric(vertical: 8.0),
@@ -248,7 +218,29 @@ class PlateItem extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: <Widget>[
-              Icon(Icons.restaurant_menu, size: 40.0),
+              // Mostrar la imagen del producto
+              Image.network(
+                imageUrl,
+                height: 60.0,
+                width: 60.0,
+                fit: BoxFit.cover,
+                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child; // Si la imagen ya está cargada, se muestra
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                            : null,
+                      ),
+                    );
+                  }
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.error, size: 60.0); // Si la imagen no se carga, muestra un ícono de error
+                },
+              ),
               SizedBox(width: 16.0),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
