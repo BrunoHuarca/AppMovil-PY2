@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'product_func.dart'; // Importa el modelo Product
-import 'package:permission_handler/permission_handler.dart';
+import 'product_func.dart'; // Asegúrate de que este archivo esté bien definido
+import 'shopping.dart'; // Importar la pantalla del carrito
+import 'profile.dart'; // Importar la pantalla del perfil
 
 class MenuScreen extends StatefulWidget {
   @override
@@ -14,14 +15,7 @@ class _MenuScreenState extends State<MenuScreen> {
   List<Product> filteredProducts = []; // Lista filtrada de productos
   bool isLoading = true;
   TextEditingController searchController = TextEditingController();
-  
-  // Valores del slider para el precio
-  double minPrice = 5.0;
-  double maxPrice = 30.0;
-  
-  // Rango de precios filtrado
-  double currentMinPrice = 5.0;
-  double currentMaxPrice = 30.0;
+  int _selectedIndex = 0; // Para controlar el índice seleccionado del BottomNavigationBar
 
   @override
   void initState() {
@@ -34,7 +28,8 @@ class _MenuScreenState extends State<MenuScreen> {
   // Función para hacer la solicitud HTTP
   Future<void> fetchProducts() async {
     try {
-      final response = await http.get(Uri.parse('https://mixturarosaaqp.com/api/productos'));
+      final response =
+          await http.get(Uri.parse('https://mixturarosaaqp.com/api/productos'));
 
       if (response.statusCode == 200) {
         // Si la solicitud fue exitosa, parsea los productos
@@ -61,7 +56,8 @@ class _MenuScreenState extends State<MenuScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Error"),
-            content: Text("No se pudieron cargar los productos. Intenta más tarde."),
+            content:
+                Text("No se pudieron cargar los productos. Intenta más tarde."),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
@@ -80,114 +76,167 @@ class _MenuScreenState extends State<MenuScreen> {
   void _filterProducts() {
     setState(() {
       filteredProducts = products
-          .where((product) =>
-              product.name.toLowerCase().contains(searchController.text.toLowerCase()) &&
-              product.price >= currentMinPrice &&
-              product.price <= currentMaxPrice)
+          .where((product) => product.name
+              .toLowerCase()
+              .contains(searchController.text.toLowerCase()))
           .toList();
     });
   }
 
-  // Función para actualizar el rango de precios
-  void _updatePriceFilter() {
+  // Función para cambiar entre las pantallas de la barra de navegación
+  void _onItemTapped(int index) {
     setState(() {
-      filteredProducts = products
-          .where((product) =>
-              product.price >= currentMinPrice && product.price <= currentMaxPrice)
-          .toList();
+      _selectedIndex = index;
     });
+    switch (index) {
+      case 0:
+        // Acción para la opción 'Inicio'
+        // Aquí podrías implementar la lógica para redirigir a la pantalla de inicio.
+        break;
+      case 1:
+        // Acción para la opción 'Carrito'
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ShoppingScreen()),
+        );
+        break;
+      case 2:
+        // Acción para la opción 'Perfil'
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ProfileScreen()),
+        );
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'RESTAURANT',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          // Cuadro de búsqueda
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                labelText: 'Buscar plato...',
-                border: OutlineInputBorder(),
-                suffixIcon: Icon(Icons.search),
-              ),
-            ),
-          ),
-          // Filtro de precio con Slider
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'Rango de precio: S/ ${currentMinPrice.toStringAsFixed(2)} - S/ ${currentMaxPrice.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      body: SingleChildScrollView( // Hacemos que toda la página sea desplazable
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'RESTAURANT',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
                 ),
-                RangeSlider(
-                  values: RangeValues(currentMinPrice, currentMaxPrice),
-                  min: minPrice,
-                  max: maxPrice,
-                  divisions: 5,
-                  labels: RangeLabels(
-                    'S/ ${currentMinPrice.toStringAsFixed(2)}',
-                    'S/ ${currentMaxPrice.toStringAsFixed(2)}',
-                  ),
-                  onChanged: (RangeValues values) {
-                    setState(() {
-                      currentMinPrice = values.start;
-                      currentMaxPrice = values.end;
-                    });
-                    _updatePriceFilter(); // Aplicar filtro de precio
-                  },
-                ),
-              ],
-            ),
-          ),
-          // Título 'Todos los platos'
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Todos los platos',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+                textAlign: TextAlign.center,
               ),
             ),
-          ),
-          // Si estamos cargando, muestra un indicador de carga
-          isLoading
-              ? Center(child: CircularProgressIndicator())
-              : Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: filteredProducts.map((product) {
-                        return PlateItem(
-                          name: product.name,
-                          price: 'S/${product.price}',
-                          time: 'N/A', // Puedes añadir un campo 'time' si lo tienes
-                          imageUrl: product.imageUrl,
+            // Cuadro de búsqueda
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                controller: searchController,
+                decoration: InputDecoration(
+                  labelText: 'Buscar plato...',
+                  border: OutlineInputBorder(),
+                  suffixIcon: Icon(Icons.search),
+                ),
+              ),
+            ),
+            // Botón 'Licorería'
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  // Aquí puedes agregar una acción cuando se presione el botón
+                },
+                child: Text('Licorería'),
+              ),
+            ),
+            // Texto 'Las Mejores Ofertas'
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Text(
+                'Las Mejores Ofertas',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            // PageView de imágenes
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Container(
+                    height: 250, // Altura de la vista de las imágenes
+                    child: PageView.builder(
+                      itemCount: 3, // Cambiar el número según la cantidad de imágenes
+                      itemBuilder: (context, index) {
+                        return Image.network(
+                          'https://via.placeholder.com/600x400', // Imagen de ejemplo
+                          fit: BoxFit.cover,
+                          width: MediaQuery.of(context).size.width,
                         );
-                      }).toList(),
+                      },
+                      onPageChanged: (index) {
+                        // Aquí puedes hacer algo cuando cambie la página
+                      },
                     ),
                   ),
+            // Título 'Todos los platos'
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Todos los platos',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
+            ),
+            // Si estamos cargando, muestra un indicador de carga
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Column(
+                    children: filteredProducts.isEmpty
+                        ? products.map((product) {
+                            return PlateItem(
+                              name: product.name,
+                              price: 'S/${product.price}',
+                              time: 'N/A', // Puedes añadir un campo 'time' si lo tienes
+                              imageUrl: product.imageUrl,
+                            );
+                          }).toList()
+                        : filteredProducts.map((product) {
+                            return PlateItem(
+                              name: product.name,
+                              price: 'S/${product.price}',
+                              time: 'N/A', // Puedes añadir un campo 'time' si lo tienes
+                              imageUrl: product.imageUrl,
+                            );
+                          }).toList(),
+                  ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Inicio',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Carrito',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
         ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+        onTap: _onItemTapped,
       ),
     );
   }
@@ -224,21 +273,25 @@ class PlateItem extends StatelessWidget {
                 height: 60.0,
                 width: 60.0,
                 fit: BoxFit.cover,
-                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                loadingBuilder: (BuildContext context, Widget child,
+                    ImageChunkEvent? loadingProgress) {
                   if (loadingProgress == null) {
                     return child; // Si la imagen ya está cargada, se muestra
                   } else {
                     return Center(
                       child: CircularProgressIndicator(
                         value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                (loadingProgress.expectedTotalBytes ?? 1)
                             : null,
                       ),
                     );
                   }
                 },
                 errorBuilder: (context, error, stackTrace) {
-                  return Icon(Icons.error, size: 60.0); // Si la imagen no se carga, muestra un ícono de error
+                  return Icon(Icons.error,
+                      size:
+                          60.0); // Si la imagen no se carga, muestra un ícono de error
                 },
               ),
               SizedBox(width: 16.0),

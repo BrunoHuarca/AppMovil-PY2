@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
-import 'offers.dart'; // Importa la pantalla de ofertas
-import 'product.dart'; // Importa la pantalla del producto
-import 'dishes.dart'; // Importa la pantalla de administración de platos
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'product_func.dart'; // Asegúrate de que este archivo esté bien definido
+import 'shopping.dart'; // Importar la pantalla del carrito
+import 'profile.dart'; // Importar la pantalla del perfil
+import 'offers.dart'; // Importar la pantalla de ofertas
+import 'dishes.dart'; // Importar la pantalla de platos
+import 'ordersadmin.dart';
 
 class MenuAdminScreen extends StatefulWidget {
   @override
@@ -9,6 +14,95 @@ class MenuAdminScreen extends StatefulWidget {
 }
 
 class _MenuAdminScreenState extends State<MenuAdminScreen> {
+  List<Product> products = []; // Lista de productos
+  List<Product> filteredProducts = []; // Lista filtrada de productos
+  bool isLoading = true;
+  TextEditingController searchController = TextEditingController();
+  int _selectedIndex =
+      0; // Para controlar el índice seleccionado del BottomNavigationBar
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProducts();
+    searchController.addListener(_filterProducts);
+  }
+
+  Future<void> fetchProducts() async {
+    try {
+      final response =
+          await http.get(Uri.parse('https://mixturarosaaqp.com/api/productos'));
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          products = data.map((item) => Product.fromJson(item)).toList();
+          filteredProducts = products;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        throw Exception('Error al cargar productos');
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+      });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content:
+                Text("No se pudieron cargar los productos. Intenta más tarde."),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _filterProducts() {
+    setState(() {
+      filteredProducts = products
+          .where((product) => product.name
+              .toLowerCase()
+              .contains(searchController.text.toLowerCase()))
+          .toList();
+    });
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    switch (index) {
+      case 0:
+        break;
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ShoppingScreen()),
+        );
+        break;
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ProfileScreen()),
+        );
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,11 +110,10 @@ class _MenuAdminScreenState extends State<MenuAdminScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            // Título "RESTAURANT"
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                'RESTAURANT',
+                'ADMINISTRACIÓN DE RESTAURANT',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -29,82 +122,74 @@ class _MenuAdminScreenState extends State<MenuAdminScreen> {
                 textAlign: TextAlign.center,
               ),
             ),
-
-            // Botón Licorería (más grande)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  // Acción para "Licorería"
-                },
-                child: Text('Licorería'),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 20.0),
-                  textStyle: TextStyle(fontSize: 22),
-                  minimumSize: Size(double.infinity, 50), // Hacer el botón más grande
+              child: TextField(
+                controller: searchController,
+                decoration: InputDecoration(
+                  labelText: 'Buscar plato...',
+                  border: OutlineInputBorder(),
+                  suffixIcon: Icon(Icons.search),
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
-
-            // Sección "Las mejores ofertas" con botón "Administrar"
             Padding(
               padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  // Aquí puedes agregar una acción cuando se presione el botón
+                },
+                child: Text('Licorería'),
+              ),
+            ),
+            // Sección 'Las Mejores Ofertas' con el botón 'Administrar'
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
+                children: [
                   Text(
-                    'Las mejores ofertas',
+                    'Las Mejores Ofertas',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      color: Colors.red,
                     ),
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      // Navegar a la pantalla de administración de ofertas
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => OffersScreen(), // Navegar a OffersScreen
-                        ),
+                        MaterialPageRoute(builder: (context) => OffersScreen()),
                       );
                     },
                     child: Text('Administrar'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue, // Color del botón
+                  ),
+                ],
+              ),
+            ),
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Container(
+                    height: 250,
+                    child: PageView.builder(
+                      itemCount: 3,
+                      itemBuilder: (context, index) {
+                        return Image.network(
+                          'https://via.placeholder.com/600x400',
+                          fit: BoxFit.cover,
+                          width: MediaQuery.of(context).size.width,
+                        );
+                      },
+                      onPageChanged: (index) {},
                     ),
                   ),
-                ],
-              ),
-            ),
-
-            // Carrusel de imágenes: "Las mejores ofertas"
-            Container(
-              height: 200.0,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: <Widget>[
-                  Card(
-                    child: Image.asset('assets/offer1.jpg'),
-                  ),
-                  Card(
-                    child: Image.asset('assets/offer2.jpg'),
-                  ),
-                  Card(
-                    child: Image.asset('assets/offer3.jpg'),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 16.0),
-
-            // Sección "Todos los platos" con botón "Administrar"
+            // Sección 'Todos los platos' con el botón 'Administrar'
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
+                children: [
                   Text(
                     'Todos los platos',
                     style: TextStyle(
@@ -114,66 +199,98 @@ class _MenuAdminScreenState extends State<MenuAdminScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      // Navegar a la pantalla de administración de platos
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => DishesScreen(), // Navegar a DishesScreen
-                        ),
+                        MaterialPageRoute(builder: (context) => DishesScreen()),
                       );
                     },
                     child: Text('Administrar'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue, // Color del botón
-                    ),
                   ),
                 ],
               ),
             ),
-
-            // Lista de platos con nombre, precio y tiempo
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  PlateItem(name: 'Chicharron', price: 'S/15.00', time: '30-45 min'),
-                  PlateItem(name: 'Lomo Saltado', price: 'S/20.00', time: '20-30 min'),
-                  PlateItem(name: 'Ceviche', price: 'S/18.00', time: '15-25 min'),
-                  PlateItem(name: 'Arroz Chaufa', price: 'S/12.00', time: '20 min'),
-                ],
-              ),
-            ),
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Column(
+                    children: filteredProducts.isEmpty
+                        ? products.map((product) {
+                            return PlateItem(
+                              name: product.name,
+                              price: 'S/${product.price}',
+                              time: 'N/A',
+                              imageUrl: product.imageUrl,
+                            );
+                          }).toList()
+                        : filteredProducts.map((product) {
+                            return PlateItem(
+                              name: product.name,
+                              price: 'S/${product.price}',
+                              time: 'N/A',
+                              imageUrl: product.imageUrl,
+                            );
+                          }).toList(),
+                  ),
           ],
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+  items: const <BottomNavigationBarItem>[
+    BottomNavigationBarItem(
+      icon: Icon(Icons.home),
+      label: 'Inicio',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.shopping_cart),
+      label: 'Pedidos',
+    ),
+  ],
+  currentIndex: _selectedIndex,
+  selectedItemColor: Colors.white, // Color de íconos seleccionados
+  unselectedItemColor: Colors.grey, // Color de íconos no seleccionados
+  backgroundColor: Colors.black, // Color de fondo del navbar
+  onTap: (index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MenuAdminScreen()),
+        );
+        break;
+      case 1: // Opción para "Pedidos"
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => OrdersAdminScreen()), // Asegúrate de tener esta pantalla creada
+        );
+        break;
+    }
+  },
+),
+
     );
   }
 }
 
-// Widget para mostrar los platos
 class PlateItem extends StatelessWidget {
   final String name;
   final String price;
   final String time;
+  final String imageUrl;
 
-  PlateItem({required this.name, required this.price, required this.time});
+  PlateItem({
+    required this.name,
+    required this.price,
+    required this.time,
+    required this.imageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navegar a la pantalla del producto al hacer clic
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductScreen(
-              name: name,
-              price: price,
-              time: time,
-            ),
-          ),
-        );
+        // Aquí puedes hacer algo cuando el usuario toque un plato
       },
       child: Card(
         margin: EdgeInsets.symmetric(vertical: 8.0),
@@ -181,7 +298,30 @@ class PlateItem extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: <Widget>[
-              Icon(Icons.restaurant_menu, size: 40.0),
+              Image.network(
+                imageUrl,
+                height: 60.0,
+                width: 60.0,
+                fit: BoxFit.cover,
+                loadingBuilder: (BuildContext context, Widget child,
+                    ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                (loadingProgress.expectedTotalBytes ?? 1)
+                            : null,
+                      ),
+                    );
+                  }
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.error, size: 60.0);
+                },
+              ),
               SizedBox(width: 16.0),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

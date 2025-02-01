@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'menu.dart'; // Importa la pantalla de inicio (menú)
 import 'shopping.dart'; // Importa la pantalla del carrito
 import 'main.dart'; // Importa la pantalla principal desde main.dart
+import 'myorder.dart'; // Importa la pantalla de pedidos
 
 class ProfileScreen extends StatelessWidget {
   @override
@@ -102,6 +103,26 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
             Text('********'), // Texto ocultando la contraseña
+            Divider(), // Línea de separación
+
+            // Nuevo apartado para ver pedido
+            GestureDetector(
+              onTap: () {
+                // Lógica para navegar a la pantalla de pedidos
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyOrderScreen()), // Redirige a la pantalla de pedidos
+                );
+              },
+              child: Text(
+                'Ver tu pedido',
+                style: TextStyle(
+                  color: Colors.blue, // Color de letra azul para destacar
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             Divider(), // Línea de separación
 
             // Opción de Cerrar sesión
