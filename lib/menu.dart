@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'product_func.dart'; // Asegúrate de que este archivo esté bien definido
 import 'shopping.dart'; // Importar la pantalla del carrito
 import 'profile.dart'; // Importar la pantalla del perfil
+import 'product.dart';
 
 class MenuScreen extends StatefulWidget {
   @override
@@ -20,7 +21,6 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   void initState() {
     super.initState();
-    // Obtener productos desde la API
     fetchProducts();
     searchController.addListener(_filterProducts);
   }
@@ -28,8 +28,7 @@ class _MenuScreenState extends State<MenuScreen> {
   // Función para hacer la solicitud HTTP
   Future<void> fetchProducts() async {
     try {
-      final response =
-          await http.get(Uri.parse('https://mixturarosaaqp.com/api/productos'));
+      final response = await http.get(Uri.parse('https://mixturarosaaqp.com/api/productos'));
 
       if (response.statusCode == 200) {
         // Si la solicitud fue exitosa, parsea los productos
@@ -40,7 +39,6 @@ class _MenuScreenState extends State<MenuScreen> {
           isLoading = false; // Cambiar el estado de carga
         });
       } else {
-        // Si no fue exitosa, muestra un error
         setState(() {
           isLoading = false;
         });
@@ -56,8 +54,7 @@ class _MenuScreenState extends State<MenuScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Error"),
-            content:
-                Text("No se pudieron cargar los productos. Intenta más tarde."),
+            content: Text("No se pudieron cargar los productos. Intenta más tarde."),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
@@ -76,9 +73,7 @@ class _MenuScreenState extends State<MenuScreen> {
   void _filterProducts() {
     setState(() {
       filteredProducts = products
-          .where((product) => product.name
-              .toLowerCase()
-              .contains(searchController.text.toLowerCase()))
+          .where((product) => product.name.toLowerCase().contains(searchController.text.toLowerCase()))
           .toList();
     });
   }
@@ -91,7 +86,6 @@ class _MenuScreenState extends State<MenuScreen> {
     switch (index) {
       case 0:
         // Acción para la opción 'Inicio'
-        // Aquí podrías implementar la lógica para redirigir a la pantalla de inicio.
         break;
       case 1:
         // Acción para la opción 'Carrito'
@@ -114,7 +108,7 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      body: SingleChildScrollView( // Hacemos que toda la página sea desplazable
+      body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             Padding(
@@ -198,22 +192,12 @@ class _MenuScreenState extends State<MenuScreen> {
             isLoading
                 ? Center(child: CircularProgressIndicator())
                 : Column(
-                    children: filteredProducts.isEmpty
-                        ? products.map((product) {
-                            return PlateItem(
-                              name: product.name,
-                              price: 'S/${product.price}',
-                              time: 'N/A', // Puedes añadir un campo 'time' si lo tienes
-                              imageUrl: product.imageUrl,
-                            );
+                    children: (filteredProducts.isNotEmpty)
+                        ? filteredProducts.map((product) {
+                            return PlateItem(product: product);
                           }).toList()
-                        : filteredProducts.map((product) {
-                            return PlateItem(
-                              name: product.name,
-                              price: 'S/${product.price}',
-                              time: 'N/A', // Puedes añadir un campo 'time' si lo tienes
-                              imageUrl: product.imageUrl,
-                            );
+                        : products.map((product) {
+                            return PlateItem(product: product);
                           }).toList(),
                   ),
           ],
@@ -243,23 +227,21 @@ class _MenuScreenState extends State<MenuScreen> {
 }
 
 class PlateItem extends StatelessWidget {
-  final String name;
-  final String price;
-  final String time;
-  final String imageUrl;
+  final Product product;
 
-  PlateItem({
-    required this.name,
-    required this.price,
-    required this.time,
-    required this.imageUrl,
-  });
+  PlateItem({required this.product});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Aquí puedes hacer algo cuando el usuario toque un plato
+        // Navegar a la pantalla de detalles del producto
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductScreen(product: product),
+          ),
+        );
       },
       child: Card(
         margin: EdgeInsets.symmetric(vertical: 8.0),
@@ -267,16 +249,15 @@ class PlateItem extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: <Widget>[
-              // Mostrar la imagen del producto
               Image.network(
-                imageUrl,
+                product.imageUrl ?? '',
                 height: 60.0,
                 width: 60.0,
                 fit: BoxFit.cover,
                 loadingBuilder: (BuildContext context, Widget child,
                     ImageChunkEvent? loadingProgress) {
                   if (loadingProgress == null) {
-                    return child; // Si la imagen ya está cargada, se muestra
+                    return child;
                   } else {
                     return Center(
                       child: CircularProgressIndicator(
@@ -289,9 +270,7 @@ class PlateItem extends StatelessWidget {
                   }
                 },
                 errorBuilder: (context, error, stackTrace) {
-                  return Icon(Icons.error,
-                      size:
-                          60.0); // Si la imagen no se carga, muestra un ícono de error
+                  return Icon(Icons.error, size: 60.0);
                 },
               ),
               SizedBox(width: 16.0),
@@ -299,11 +278,10 @@ class PlateItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    name,
+                    product.name ?? 'Nombre no disponible',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  Text(price),
-                  Text('Tiempo: $time'),
+                  Text('S/${product.price ?? 'Precio no disponible'}'),
                 ],
               ),
             ],
