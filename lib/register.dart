@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'main.dart'; // Para volver a la pantalla principal después de registrarse.
 
 class RegisterScreen extends StatefulWidget {
@@ -12,15 +14,87 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _direccionController = TextEditingController();
   final TextEditingController _referenciaController = TextEditingController();
+  final TextEditingController _ubicacionController = TextEditingController(); // Nuevo campo
 
-  bool _isChecked = false; // Estado del checkbox para los términos y condiciones.
+  bool _isChecked = false; // Checkbox de términos y condiciones.
+  bool _isLoading = false; // Estado para mostrar el indicador de carga.
+
+  Future<void> _register() async {
+    if (_numeroController.text.isEmpty ||
+        _nombreController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _direccionController.text.isEmpty ||
+        _referenciaController.text.isEmpty ||
+        _ubicacionController.text.isEmpty || // Validar Ubicacion
+        !_isChecked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Por favor, complete todos los campos y acepte los términos y condiciones'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final String apiUrl = 'https://mixturarosaaqp.com/api/auth/register'; // URL de la API de registro
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'Numero': _numeroController.text.trim(),
+          'Nombre': _nombreController.text.trim(),
+          'Contraseña': _passwordController.text.trim(),
+          'Direccion': _direccionController.text.trim(), // Corregido (sin tilde)
+          'Referencia': _referenciaController.text.trim(),
+          'Ubicacion': _ubicacionController.text.trim(), // Nuevo campo
+          'Rol': 'usuario', // Se asigna por defecto
+        }),
+      );
+
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      print('Respuesta del servidor: $responseData');
+
+      if (response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registro exitoso, por favor inicie sesión')),
+        );
+
+        // Navegar al LoginScreen después del registro exitoso
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(responseData['mensaje'] ?? 'Error al registrarse'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error de conexión: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: WillPopScope(
         onWillPop: () async {
-          // Navegar de vuelta al LoginScreen si se presiona la flecha de retroceso.
           Navigator.of(context).pop();
           return false;
         },
@@ -32,7 +106,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  // Título principal 'Mixtura ROSA'
                   Text(
                     'Mixtura ROSA',
                     style: TextStyle(
@@ -44,7 +117,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   SizedBox(height: 32.0),
 
-                  // Campo para ingresar el número de celular
                   TextField(
                     controller: _numeroController,
                     keyboardType: TextInputType.phone,
@@ -56,7 +128,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   SizedBox(height: 16.0),
 
-                  // Campo para ingresar el nombre
                   TextField(
                     controller: _nombreController,
                     decoration: InputDecoration(
@@ -67,7 +138,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   SizedBox(height: 16.0),
 
-                  // Campo para ingresar la contraseña
                   TextField(
                     controller: _passwordController,
                     decoration: InputDecoration(
@@ -79,10 +149,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   SizedBox(height: 16.0),
 
-                  // Campo para ingresar la dirección (más largo)
                   TextField(
                     controller: _direccionController,
-                    maxLines: 2, // Hacer el campo más largo
+                    maxLines: 2,
                     decoration: InputDecoration(
                       labelText: 'Dirección',
                       border: OutlineInputBorder(),
@@ -91,10 +160,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   SizedBox(height: 16.0),
 
-                  // Campo para ingresar la referencia (más largo)
                   TextField(
                     controller: _referenciaController,
-                    maxLines: 2, // Hacer el campo más largo
+                    maxLines: 2,
                     decoration: InputDecoration(
                       labelText: 'Referencia',
                       border: OutlineInputBorder(),
@@ -103,7 +171,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   SizedBox(height: 16.0),
 
-                  // Checkbox para aceptar términos y condiciones
+                  TextField(
+                    controller: _ubicacionController,
+                    decoration: InputDecoration(
+                      labelText: 'Ubicación',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.map),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+
                   Row(
                     children: <Widget>[
                       Checkbox(
@@ -124,42 +201,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   SizedBox(height: 16.0),
 
-                  // Botón 'Registrarse'
-                  ElevatedButton(
-                    onPressed: () {
-                      // Verificar que todos los campos estén llenos y que se haya marcado el checkbox.
-                      if (_numeroController.text.isNotEmpty &&
-                          _nombreController.text.isNotEmpty &&
-                          _passwordController.text.isNotEmpty &&
-                          _direccionController.text.isNotEmpty &&
-                          _referenciaController.text.isNotEmpty &&
-                          _isChecked) {
-                        // Navegar de vuelta al LoginScreen
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                              builder: (context) => LoginScreen()),
-                        );
-                        print('Registro exitoso');
-                      } else {
-                        // Mostrar un mensaje si faltan campos por llenar o si no se ha aceptado los términos.
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'Por favor, complete todos los campos y acepte los términos y condiciones'),
-                            backgroundColor: Colors.red,
+                  _isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : ElevatedButton(
+                          onPressed: _register,
+                          child: Text('Registrarse'),
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            textStyle: TextStyle(fontSize: 18),
                           ),
-                        );
-                      }
-                    },
-                    child: Text('Registrarse'),
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      textStyle: TextStyle(fontSize: 18),
-                    ),
-                  ),
+                        ),
                   SizedBox(height: 16.0),
 
-                  // Enlace para ir al LoginScreen si ya se tiene cuenta
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -167,15 +220,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                                builder: (context) => LoginScreen()),
+                            MaterialPageRoute(builder: (context) => LoginScreen()),
                           );
                         },
                         child: Text(
                           'Ingresar',
                           style: TextStyle(
-                              color: Colors.blue,
-                              decoration: TextDecoration.underline),
+                              color: Colors.blue, decoration: TextDecoration.underline),
                         ),
                       ),
                     ],

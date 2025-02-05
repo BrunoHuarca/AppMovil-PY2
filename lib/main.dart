@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'menu.dart'; // Importa la vista de menú.
 import 'menuadmin.dart'; // Importa la vista de menú admin.
 import 'register.dart'; // Importa la vista de registro.
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,17 +17,90 @@ class MyApp extends StatelessWidget {
       title: 'Login Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Colors.white, // Cambiar fondo a blanco
+        scaffoldBackgroundColor: Colors.white,
       ),
       home: LoginScreen(),
-      debugShowCheckedModeBanner: false, // Eliminar banner de debug
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _numeroController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+Future<void> _login() async {
+  final String apiUrl = 'https://mixturarosaaqp.com/api/auth/login';
+  final String nombre = _numeroController.text.trim();
+  final String password = _passwordController.text.trim();
+
+  if (nombre.isEmpty || password.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Por favor, ingrese nombre y contraseña')),
+    );
+    return;
+  }
+
+  setState(() {
+    _isLoading = true;
+  });
+
+  try {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'Nombre': nombre, 'Contraseña': password}),
+    );
+
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    print('Respuesta del servidor: $responseData');
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Inicio de sesión exitoso')),
+      );
+
+      // Extraer token y decodificarlo
+      String? token = responseData['token'];
+      if (token != null) {
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+        String rol = decodedToken['Rol']; // Extrae el rol del usuario
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (rol == 'admin') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => MenuAdminScreen()),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => MenuScreen()),
+            );
+          }
+        });
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(responseData['mensaje'] ?? 'Error al iniciar sesión')),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error de conexión: $e')),
+    );
+  }
+
+  setState(() {
+    _isLoading = false;
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +112,6 @@ class LoginScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              // Título del formulario
               Text(
                 'Iniciar sesión',
                 style: TextStyle(
@@ -47,20 +122,15 @@ class LoginScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 32.0),
-
-              // Campo para ingresar el número de celular
               TextField(
                 controller: _numeroController,
-                keyboardType: TextInputType.phone, // Para mostrar teclado numérico
                 decoration: InputDecoration(
-                  labelText: 'Número',
+                  labelText: 'Nombre',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.phone),
+                  prefixIcon: Icon(Icons.person),
                 ),
               ),
               SizedBox(height: 16.0),
-
-              // Campo para ingresar la contraseña
               TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(
@@ -68,50 +138,27 @@ class LoginScreen extends StatelessWidget {
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.lock),
                 ),
-                obscureText: true, // Ocultar la contraseña
+                obscureText: true,
               ),
               SizedBox(height: 32.0),
-
-              // Botón para iniciar sesión
-              ElevatedButton(
-                onPressed: () {
-                  // Validar las credenciales.
-                  final numero = _numeroController.text;
-                  final password = _passwordController.text;
-
-                  if (numero == '999999999' && password == '123') {
-                    // Navegar a Menu Admin si las credenciales son correctas.
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => MenuAdminScreen()),
-                    );
-                  } else {
-                    // Navegar a Menu si las credenciales no son de admin.
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => MenuScreen()),
-                    );
-                  }
-                },
-                child: Text('Iniciar sesión'),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  textStyle: TextStyle(fontSize: 18),
-                ),
-              ),
+              _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : ElevatedButton(
+                      onPressed: _login,
+                      child: Text('Iniciar sesión'),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 16.0),
+                        textStyle: TextStyle(fontSize: 18),
+                      ),
+                    ),
               SizedBox(height: 16.0),
-
-              // Texto "Aún no tienes cuenta?"
               Text(
                 '¿Aún no tienes cuenta?',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16),
               ),
-
-              // Enlace de registrarse
               TextButton(
                 onPressed: () {
-                  // Navegar a la pantalla de registro
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => RegisterScreen()),
@@ -119,7 +166,7 @@ class LoginScreen extends StatelessWidget {
                 },
                 child: Text('Registrarse'),
                 style: TextButton.styleFrom(
-                  foregroundColor: Colors.blue, // Cambiar el color del texto
+                  foregroundColor: Colors.blue,
                   textStyle: TextStyle(
                       fontSize: 16, decoration: TextDecoration.underline),
                 ),
