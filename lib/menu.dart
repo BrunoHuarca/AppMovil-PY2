@@ -16,7 +16,8 @@ class _MenuScreenState extends State<MenuScreen> {
   List<Product> filteredProducts = []; // Lista filtrada de productos
   bool isLoading = true;
   TextEditingController searchController = TextEditingController();
-  int _selectedIndex = 0; // Para controlar el índice seleccionado del BottomNavigationBar
+  int _selectedIndex =
+      0; // Para controlar el índice seleccionado del BottomNavigationBar
 
   @override
   void initState() {
@@ -28,14 +29,16 @@ class _MenuScreenState extends State<MenuScreen> {
   // Función para hacer la solicitud HTTP
   Future<void> fetchProducts() async {
     try {
-      final response = await http.get(Uri.parse('https://mixturarosaaqp.com/api/productos'));
+      final response =
+          await http.get(Uri.parse('https://mixturarosaaqp.com/api/productos'));
 
       if (response.statusCode == 200) {
         // Si la solicitud fue exitosa, parsea los productos
         List<dynamic> data = json.decode(response.body);
         setState(() {
           products = data.map((item) => Product.fromJson(item)).toList();
-          filteredProducts = products; // Inicializa la lista filtrada con todos los productos
+          filteredProducts =
+              products; // Inicializa la lista filtrada con todos los productos
           isLoading = false; // Cambiar el estado de carga
         });
       } else {
@@ -54,7 +57,8 @@ class _MenuScreenState extends State<MenuScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Error"),
-            content: Text("No se pudieron cargar los productos. Intenta más tarde."),
+            content:
+                Text("No se pudieron cargar los productos. Intenta más tarde."),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
@@ -73,7 +77,9 @@ class _MenuScreenState extends State<MenuScreen> {
   void _filterProducts() {
     setState(() {
       filteredProducts = products
-          .where((product) => product.name.toLowerCase().contains(searchController.text.toLowerCase()))
+          .where((product) => product.name
+              .toLowerCase()
+              .contains(searchController.text.toLowerCase()))
           .toList();
     });
   }
@@ -116,13 +122,14 @@ class _MenuScreenState extends State<MenuScreen> {
               child: Text(
                 'RESTAURANT',
                 style: TextStyle(
-                  fontSize: 32,
+                  fontSize: 18, // Tamaño de texto más pequeño
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: Colors.white, // Color blanco
                 ),
                 textAlign: TextAlign.center,
               ),
             ),
+
             // Cuadro de búsqueda
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -130,11 +137,21 @@ class _MenuScreenState extends State<MenuScreen> {
                 controller: searchController,
                 decoration: InputDecoration(
                   labelText: 'Buscar plato...',
+                  labelStyle: TextStyle(
+                    color: Colors.white, // Color blanco para el placeholder
+                  ),
                   border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.search),
+                  suffixIcon: Icon(
+                    Icons.search,
+                    color: Color(
+                        0xFFEA572A), // Color #EA572A para el ícono de la lupa
+                  ),
                 ),
+                style: TextStyle(
+                    color: Colors.white), // Texto ingresado también en blanco
               ),
             ),
+
             // Botón 'Licorería'
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -142,29 +159,49 @@ class _MenuScreenState extends State<MenuScreen> {
                 onPressed: () {
                   // Aquí puedes agregar una acción cuando se presione el botón
                 },
-                child: Text('Licorería'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFEA572A), // Color de fondo #EA572A
+                  foregroundColor: Colors.white, // Color del texto blanco
+                  minimumSize: Size(200, 60), // Ancho y alto mínimos del botón
+                  padding: EdgeInsets.symmetric(
+                      vertical: 16.0,
+                      horizontal: 32.0), // Ajustar el padding interno
+                ),
+                child: Text(
+                  'Licorería',
+                  style:
+                      TextStyle(fontSize: 20), // Tamaño de la fuente del texto
+                ),
               ),
             ),
+
             // Texto 'Las Mejores Ofertas'
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Text(
-                'Las Mejores Ofertas',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
+              padding: const EdgeInsets.symmetric(
+                  vertical: 16.0,
+                  horizontal: 8.0), // Agregar padding horizontal
+              child: Align(
+                alignment:
+                    Alignment.centerLeft, // Alinear el texto a la izquierda
+                child: Text(
+                  'Las Mejores Ofertas',
+                  style: TextStyle(
+                    fontSize: 18, // Reducir el tamaño del texto
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // Color blanco
+                  ),
                 ),
-                textAlign: TextAlign.center,
               ),
             ),
+
             // PageView de imágenes
             isLoading
                 ? Center(child: CircularProgressIndicator())
                 : Container(
                     height: 250, // Altura de la vista de las imágenes
                     child: PageView.builder(
-                      itemCount: 3, // Cambiar el número según la cantidad de imágenes
+                      itemCount:
+                          3, // Cambiar el número según la cantidad de imágenes
                       itemBuilder: (context, index) {
                         return Image.network(
                           'https://via.placeholder.com/600x400', // Imagen de ejemplo
@@ -179,12 +216,19 @@ class _MenuScreenState extends State<MenuScreen> {
                   ),
             // Título 'Todos los platos'
             Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Todos los platos',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+              padding: const EdgeInsets.symmetric(
+                  vertical: 16.0,
+                  horizontal: 8.0), // Agregar padding horizontal
+              child: Align(
+                alignment:
+                    Alignment.centerLeft, // Alinear el texto a la izquierda
+                child: Text(
+                  'Todos los platos',
+                  style: TextStyle(
+                    fontSize: 18, // Reducir el tamaño del texto
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // Color blanco
+                  ),
                 ),
               ),
             ),
@@ -219,7 +263,10 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
+        backgroundColor:
+            Color(0xFFEA572A), // Color de fondo del BottomNavigationBar
+        selectedItemColor: Color(0xFF280E0E), // Color para el ítem seleccionado
+        unselectedItemColor: Colors.white, // Color para ítems no seleccionados
         onTap: _onItemTapped,
       ),
     );

@@ -14,7 +14,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _direccionController = TextEditingController();
   final TextEditingController _referenciaController = TextEditingController();
-  final TextEditingController _ubicacionController = TextEditingController(); // Nuevo campo
+  final TextEditingController _ubicacionController =
+      TextEditingController(); // Nuevo campo
 
   bool _isChecked = false; // Checkbox de términos y condiciones.
   bool _isLoading = false; // Estado para mostrar el indicador de carga.
@@ -29,7 +30,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         !_isChecked) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Por favor, complete todos los campos y acepte los términos y condiciones'),
+          content: Text(
+              'Por favor, complete todos los campos y acepte los términos y condiciones'),
           backgroundColor: Colors.red,
         ),
       );
@@ -40,7 +42,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _isLoading = true;
     });
 
-    final String apiUrl = 'https://mixturarosaaqp.com/api/auth/register'; // URL de la API de registro
+    final String apiUrl =
+        'https://mixturarosaaqp.com/api/auth/register'; // URL de la API de registro
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -49,7 +52,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           'Numero': _numeroController.text.trim(),
           'Nombre': _nombreController.text.trim(),
           'Contraseña': _passwordController.text.trim(),
-          'Direccion': _direccionController.text.trim(), // Corregido (sin tilde)
+          'Direccion':
+              _direccionController.text.trim(), // Corregido (sin tilde)
           'Referencia': _referenciaController.text.trim(),
           'Ubicacion': _ubicacionController.text.trim(), // Nuevo campo
           'Rol': 'usuario', // Se asigna por defecto
@@ -106,83 +110,114 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Text(
-                    'Mixtura ROSA',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                    textAlign: TextAlign.center,
+                  Image.asset(
+                    'assets/images/Logo-2.png',
+                    height: 150.0,
                   ),
                   SizedBox(height: 32.0),
 
+                  // Número
                   TextField(
                     controller: _numeroController,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       labelText: 'Número',
+                      labelStyle: TextStyle(
+                          color:
+                              Colors.white), // Texto de la etiqueta en blanco
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.phone),
+                      prefixIcon: Icon(Icons.phone, color: Colors.white),
+                      hintText: 'Ingrese su número', // Placeholder
+                      hintStyle: TextStyle(
+                          color: Colors.white), // Placeholder en blanco
                     ),
+                    style: TextStyle(
+                        color: Colors.white), // Texto del input en blanco
                   ),
                   SizedBox(height: 16.0),
 
+                  // Nombre
                   TextField(
                     controller: _nombreController,
                     decoration: InputDecoration(
                       labelText: 'Nombre',
+                      labelStyle: TextStyle(color: Colors.white),
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.person),
+                      prefixIcon: Icon(Icons.person, color: Colors.white),
+                      hintText: 'Ingrese su nombre',
+                      hintStyle: TextStyle(color: Colors.white),
                     ),
+                    style: TextStyle(color: Colors.white),
                   ),
                   SizedBox(height: 16.0),
 
+                  // Contraseña
                   TextField(
                     controller: _passwordController,
                     decoration: InputDecoration(
                       labelText: 'Contraseña',
+                      labelStyle: TextStyle(color: Colors.white),
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.lock),
+                      prefixIcon: Icon(Icons.lock, color: Colors.white),
+                      hintText: 'Ingrese su contraseña',
+                      hintStyle: TextStyle(color: Colors.white),
                     ),
                     obscureText: true,
+                    style: TextStyle(color: Colors.white),
                   ),
                   SizedBox(height: 16.0),
 
+                  // Dirección
                   TextField(
                     controller: _direccionController,
                     maxLines: 2,
                     decoration: InputDecoration(
                       labelText: 'Dirección',
+                      labelStyle: TextStyle(color: Colors.white),
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.home),
+                      prefixIcon: Icon(Icons.home, color: Colors.white),
+                      hintText: 'Ingrese su dirección',
+                      hintStyle: TextStyle(color: Colors.white),
                     ),
+                    style: TextStyle(color: Colors.white),
                   ),
                   SizedBox(height: 16.0),
 
+                  // Referencia
                   TextField(
                     controller: _referenciaController,
                     maxLines: 2,
                     decoration: InputDecoration(
                       labelText: 'Referencia',
+                      labelStyle: TextStyle(color: Colors.white),
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.location_on),
+                      prefixIcon: Icon(Icons.location_on, color: Colors.white),
+                      hintText: 'Ingrese una referencia',
+                      hintStyle: TextStyle(color: Colors.white),
                     ),
+                    style: TextStyle(color: Colors.white),
                   ),
                   SizedBox(height: 16.0),
 
+                  // Ubicación
                   TextField(
                     controller: _ubicacionController,
                     decoration: InputDecoration(
                       labelText: 'Ubicación',
+                      labelStyle: TextStyle(color: Colors.white),
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.map),
+                      prefixIcon: Icon(Icons.map, color: Colors.white),
+                      hintText: 'Ingrese su ubicación',
+                      hintStyle: TextStyle(color: Colors.white),
                     ),
+                    style: TextStyle(color: Colors.white),
                   ),
                   SizedBox(height: 16.0),
 
+                  // Checkbox y texto de términos y condiciones
                   Row(
                     children: <Widget>[
+                      // Cambios en el Checkbox:
                       Checkbox(
                         value: _isChecked,
                         onChanged: (value) {
@@ -190,43 +225,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             _isChecked = value!;
                           });
                         },
+                        activeColor: Color(
+                            0xFFEA572A), // Cambié a un color más visible en lugar de blanco
+                        checkColor: Colors.white, // Color del "check"
                       ),
+
                       Expanded(
                         child: Text(
                           'He leído y acepto los términos y condiciones de uso',
-                          style: TextStyle(fontSize: 14),
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white), // Texto en blanco
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: 16.0),
 
-                  _isLoading
-                      ? Center(child: CircularProgressIndicator())
-                      : ElevatedButton(
-                          onPressed: _register,
-                          child: Text('Registrarse'),
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            textStyle: TextStyle(fontSize: 18),
+                  Center(
+                    child: _isLoading
+                        ? CircularProgressIndicator()
+                        : SizedBox(
+                            width: double
+                                .infinity, // Ocupa todo el ancho disponible
+                            child: ElevatedButton(
+                              onPressed: _register,
+                              child: Text('Registrarse'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Color(0xFFEA572A), // Color de fondo #EA572A
+                                padding: EdgeInsets.symmetric(vertical: 16.0),
+                                textStyle:
+                                    TextStyle(fontSize: 18), // Tamaño de texto
+                                foregroundColor:
+                                    Colors.white, // Color del texto (blanco)
+                              ),
+                            ),
                           ),
-                        ),
+                  ),
+
                   SizedBox(height: 16.0),
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text('¿Ya tienes una cuenta?'),
+                      Text('¿Ya tienes una cuenta?',
+                          style: TextStyle(color: Colors.white)),
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (context) => LoginScreen()),
+                            MaterialPageRoute(
+                                builder: (context) => LoginScreen()),
                           );
                         },
                         child: Text(
                           'Ingresar',
                           style: TextStyle(
-                              color: Colors.blue, decoration: TextDecoration.underline),
+                              color: Color(0xFFEA572A),
+                              decoration: TextDecoration.underline),
                         ),
                       ),
                     ],
