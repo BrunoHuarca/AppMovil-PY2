@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'main.dart'; // Para volver a la pantalla principal después de registrarse.
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
+
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -15,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _direccionController = TextEditingController();
   final TextEditingController _referenciaController = TextEditingController();
   final TextEditingController _ubicacionController = TextEditingController(); // Nuevo campo
+  String _ubicacionJson = ""; // Almacena {"lat": ..., "lng": ...}
 
   bool _isChecked = false; // Checkbox de términos y condiciones.
   bool _isLoading = false; // Estado para mostrar el indicador de carga.
@@ -51,7 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           'Contraseña': _passwordController.text.trim(),
           'Direccion': _direccionController.text.trim(), // Corregido (sin tilde)
           'Referencia': _referenciaController.text.trim(),
-          'Ubicacion': _ubicacionController.text.trim(), // Nuevo campo
+          'Ubicacion': _ubicacionJson, // Nuevo campo
           'Rol': 'usuario', // Se asigna por defecto
         }),
       );
@@ -173,12 +178,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   TextField(
                     controller: _ubicacionController,
+                    readOnly: true,
                     decoration: InputDecoration(
                       labelText: 'Ubicación',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.map),
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.location_searching),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => MapScreen(
+                                onLocationSelected: (locationJson, address) {
+                                  setState(() {
+                                    _ubicacionController.text = address; // Muestra la dirección
+                                    _ubicacionJson = locationJson; // Guarda {"lat": ..., "lng": ...}
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
+
                   SizedBox(height: 16.0),
 
                   Row(
@@ -236,6 +260,186 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+
+class MapScreen extends StatefulWidget {
+  final Function(String, String) onLocationSelected;
+
+  MapScreen({required this.onLocationSelected});
+
+  @override
+  _MapScreenState createState() => _MapScreenState();
+}
+
+class _MapScreenState extends State<MapScreen> {
+  LatLng? selectedLocation;
+  TextEditingController _searchController = TextEditingController();
+  MapController _mapController = MapController();
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) return;
+
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    setState(() {
+      selectedLocation = LatLng(position.latitude, position.longitude);
+      _mapController.move(selectedLocation!, 15.0);
+    });
+  }
+
+  void _onTap(LatLng latlng) async {
+    setState(() {
+      selectedLocation = latlng;
+    });
+    await _reverseGeocode(latlng);
+  }
+
+  Future<void> _reverseGeocode(LatLng latlng) async {
+    final url = Uri.parse(
+        'https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.latitude}&lon=${latlng.longitude}');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      String address = data['display_name'] ?? "Ubicación desconocida";
+      setState(() {
+        _searchController.text = address;
+      });
+    }
+  }
+
+  Future<void> _searchLocation() async {
+    final query = _searchController.text;
+    if (query.isEmpty) return;
+
+    final url = Uri.parse(
+        'https://nominatim.openstreetmap.org/search?format=json&q=$query');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data.isNotEmpty) {
+        double lat = double.parse(data[0]['lat']);
+        double lon = double.parse(data[0]['lon']);
+        setState(() {
+          selectedLocation = LatLng(lat, lon);
+          _mapController.move(selectedLocation!, 15.0);
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Seleccionar Ubicación")),
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: "Buscar calle o distrito",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: _searchLocation,
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            child: Stack(
+              children: [
+                FlutterMap(
+                  mapController: _mapController,
+                  options: MapOptions(
+                    center: LatLng(-16.426203, -71.50644),
+                    zoom: 13.0,
+                    minZoom: 3.0,
+                    maxZoom: 18.0,
+                    onTap: (tapPosition, latlng) => _onTap(latlng),
+                    interactiveFlags: InteractiveFlag.all, // 🔥 Habilita zoom con pellizco
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                      subdomains: ['a', 'b', 'c'],
+                    ),
+                    if (selectedLocation != null)
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            width: 40.0,
+                            height: 40.0,
+                            point: selectedLocation!,
+                            builder: (context) =>
+                                Icon(Icons.location_pin, color: Colors.red, size: 40),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Column(
+                    children: [
+                      FloatingActionButton(
+                        mini: true,
+                        child: Icon(Icons.zoom_in),
+                        onPressed: () {
+                          _mapController.move(_mapController.center, _mapController.zoom + 1);
+                        },
+                      ),
+                      SizedBox(height: 8),
+                      FloatingActionButton(
+                        mini: true,
+                        child: Icon(Icons.zoom_out),
+                        onPressed: () {
+                          _mapController.move(_mapController.center, _mapController.zoom - 1);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.check),
+        onPressed: () {
+          if (selectedLocation != null) {
+            widget.onLocationSelected(
+              '{"lat":${selectedLocation!.latitude},"lng":${selectedLocation!.longitude}}',
+              _searchController.text,
+            );
+            Navigator.pop(context);
+          }
+        },
       ),
     );
   }
