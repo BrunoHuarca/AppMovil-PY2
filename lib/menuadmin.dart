@@ -18,8 +18,7 @@ class _MenuAdminScreenState extends State<MenuAdminScreen> {
   List<Product> filteredProducts = []; // Lista filtrada de productos
   bool isLoading = true;
   TextEditingController searchController = TextEditingController();
-  int _selectedIndex =
-      0; // Para controlar el índice seleccionado del BottomNavigationBar
+  int _selectedIndex = 0; // Para controlar el índice seleccionado del BottomNavigationBar
 
   @override
   void initState() {
@@ -30,8 +29,7 @@ class _MenuAdminScreenState extends State<MenuAdminScreen> {
 
   Future<void> fetchProducts() async {
     try {
-      final response =
-          await http.get(Uri.parse('https://mixturarosaaqp.com/api/productos'));
+      final response = await http.get(Uri.parse('https://mixturarosaaqp.com/api/productos'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
@@ -55,8 +53,7 @@ class _MenuAdminScreenState extends State<MenuAdminScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Error"),
-            content:
-                Text("No se pudieron cargar los productos. Intenta más tarde."),
+            content: Text("No se pudieron cargar los productos. Intenta más tarde."),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
@@ -74,9 +71,8 @@ class _MenuAdminScreenState extends State<MenuAdminScreen> {
   void _filterProducts() {
     setState(() {
       filteredProducts = products
-          .where((product) => product.name
-              .toLowerCase()
-              .contains(searchController.text.toLowerCase()))
+          .where((product) =>
+              product.name.toLowerCase().contains(searchController.text.toLowerCase()))
           .toList();
     });
   }
@@ -136,10 +132,13 @@ class _MenuAdminScreenState extends State<MenuAdminScreen> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFEA572A), // Color de fondo #EA572A
+                ),
                 onPressed: () {
                   // Aquí puedes agregar una acción cuando se presione el botón
                 },
-                child: Text('Licorería'),
+                child: Text('Licorería', style: TextStyle(color: Colors.white)), // Texto en blanco
               ),
             ),
             // Sección 'Las Mejores Ofertas' con el botón 'Administrar'
@@ -157,13 +156,16 @@ class _MenuAdminScreenState extends State<MenuAdminScreen> {
                     ),
                   ),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFEA572A), // Color de fondo #EA572A
+                    ),
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => OffersScreen()),
                       );
                     },
-                    child: Text('Administrar'),
+                    child: Text('Administrar', style: TextStyle(color: Colors.white)), // Texto en blanco
                   ),
                 ],
               ),
@@ -198,13 +200,16 @@ class _MenuAdminScreenState extends State<MenuAdminScreen> {
                     ),
                   ),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFEA572A), // Color de fondo #EA572A
+                    ),
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => DishesScreen()),
                       );
                     },
-                    child: Text('Administrar'),
+                    child: Text('Administrar', style: TextStyle(color: Colors.white)), // Texto en blanco
                   ),
                 ],
               ),
@@ -234,41 +239,40 @@ class _MenuAdminScreenState extends State<MenuAdminScreen> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-  items: const <BottomNavigationBarItem>[
-    BottomNavigationBarItem(
-      icon: Icon(Icons.home),
-      label: 'Inicio',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.shopping_cart),
-      label: 'Pedidos',
-    ),
-  ],
-  currentIndex: _selectedIndex,
-  selectedItemColor: Colors.white, // Color de íconos seleccionados
-  unselectedItemColor: Colors.grey, // Color de íconos no seleccionados
-  backgroundColor: Colors.black, // Color de fondo del navbar
-  onTap: (index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    switch (index) {
-      case 0:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => MenuAdminScreen()),
-        );
-        break;
-      case 1: // Opción para "Pedidos"
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => OrdersAdminScreen()), // Asegúrate de tener esta pantalla creada
-        );
-        break;
-    }
-  },
-),
-
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Inicio',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Pedidos',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.white, // Color de íconos seleccionados
+        unselectedItemColor: Colors.grey, // Color de íconos no seleccionados
+        backgroundColor: Colors.black, // Color de fondo del navbar
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          switch (index) {
+            case 0:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => MenuAdminScreen()),
+              );
+              break;
+            case 1: // Opción para "Pedidos"
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => OrdersAdminScreen()), // Asegúrate de tener esta pantalla creada
+              );
+              break;
+          }
+        },
+      ),
     );
   }
 }
@@ -312,14 +316,11 @@ class PlateItem extends StatelessWidget {
                       child: CircularProgressIndicator(
                         value: loadingProgress.expectedTotalBytes != null
                             ? loadingProgress.cumulativeBytesLoaded /
-                                (loadingProgress.expectedTotalBytes ?? 1)
+                                (loadingProgress.expectedTotalBytes!)
                             : null,
                       ),
                     );
                   }
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(Icons.error, size: 60.0);
                 },
               ),
               SizedBox(width: 16.0),
@@ -328,10 +329,25 @@ class PlateItem extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     name,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  Text(price),
-                  Text('Tiempo: $time'),
+                  Text(
+                    price,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  Text(
+                    time,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ],
               ),
             ],

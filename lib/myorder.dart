@@ -57,7 +57,11 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tu Pedido'),
+        title: Text(
+          'Tu Pedido',
+          style: TextStyle(color: Colors.black), // Letras del AppBar en negro
+        ),
+        backgroundColor: Color(0xFFC44949), // Fondo del AppBar color #C44949
       ),
       body: Column(
         children: [
@@ -103,7 +107,11 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
               children: [
                 Text(
                   'Detalles del Pedido',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // Texto en blanco
+                  ),
                 ),
                 SizedBox(height: 16.0), // Espacio entre elementos
                 _buildOrderDetailRow('Ubicación', 'Calle Ejemplo 123'),
@@ -130,9 +138,17 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
         children: [
           Text(
             label,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white, // Texto de las etiquetas en blanco
+            ),
           ),
-          Text(value),
+          Text(
+            value,
+            style: TextStyle(
+              color: Colors.white70, // Texto de los valores en blanco suave
+            ),
+          ),
         ],
       ),
     );

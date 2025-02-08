@@ -24,13 +24,20 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Carrito'),
+        title: Text(
+          'Carrito',
+          style: TextStyle(color: Colors.black), // Texto negro en el AppBar
+        ),
+        backgroundColor: Color(0xFFC44949), // Fondo del AppBar en color #C44949
       ),
       body: ShoppingScreen.cartItems.isEmpty
           ? Center(
               child: Text(
                 'Tu carrito está vacío',
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white, // Texto blanco para el cuerpo
+                ),
               ),
             )
           : Column(
@@ -40,24 +47,51 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
                     itemCount: ShoppingScreen.cartItems.length,
                     itemBuilder: (context, index) {
                       final item = ShoppingScreen.cartItems[index];
-                      return ListTile(
-                        title: Text(item['name']),
-                        subtitle: Text('Cantidad: ${item['quantity']}'),
-                        trailing: Text('S/${item['price']}'),
-                        onLongPress: () {
-                          removeItem(index);
-                        },
+                      return Card(
+                        child: ListTile(
+                          title: Text(
+                            item['name'],
+                            style: TextStyle(color: Colors.black), // Nombre en negro
+                          ),
+                          subtitle: Text(
+                            'Cantidad: ${item['quantity']}',
+                            style: TextStyle(color: Colors.grey[700]), // Subtítulo en gris oscuro
+                          ),
+                          trailing: Text(
+                            'S/${item['price']}',
+                            style: TextStyle(color: Colors.black), // Precio en negro
+                          ),
+                          onLongPress: () {
+                            removeItem(index);
+                          },
+                        ),
                       );
                     },
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Text('Subtotal: S/$subtotal',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      )),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Subtotal:',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black, // Subtotal en negro
+                        ),
+                      ),
+                      Text(
+                        'S/$subtotal',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black, // Subtotal en negro
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

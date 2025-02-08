@@ -30,7 +30,8 @@ class ProfileScreen extends StatelessWidget {
               children: <Widget>[
                 Text(
                   'Celular: 902311395',
-                  style: TextStyle(color: Colors.white), // Color de texto blanco
+                  style:
+                      TextStyle(color: Colors.white), // Color de texto blanco
                 ),
                 SizedBox(width: 10),
                 TextButton(
@@ -39,7 +40,8 @@ class ProfileScreen extends StatelessWidget {
                   },
                   child: Text(
                     'Editar',
-                    style: TextStyle(color: Colors.white), // Color de texto blanco
+                    style:
+                        TextStyle(color: Colors.white), // Color de texto blanco
                   ),
                 ),
               ],
@@ -61,7 +63,8 @@ class ProfileScreen extends StatelessWidget {
               children: <Widget>[
                 Text(
                   'Dirección',
-                  style: TextStyle(color: Colors.white), // Color de texto blanco
+                  style:
+                      TextStyle(color: Colors.white), // Color de texto blanco
                 ),
                 TextButton(
                   onPressed: () {
@@ -69,7 +72,8 @@ class ProfileScreen extends StatelessWidget {
                   },
                   child: Text(
                     'Cambiar',
-                    style: TextStyle(color: Colors.white), // Color de texto blanco
+                    style:
+                        TextStyle(color: Colors.white), // Color de texto blanco
                   ),
                 ),
               ],
@@ -86,7 +90,8 @@ class ProfileScreen extends StatelessWidget {
               children: <Widget>[
                 Text(
                   'Referencia',
-                  style: TextStyle(color: Colors.white), // Color de texto blanco
+                  style:
+                      TextStyle(color: Colors.white), // Color de texto blanco
                 ),
                 TextButton(
                   onPressed: () {
@@ -94,7 +99,8 @@ class ProfileScreen extends StatelessWidget {
                   },
                   child: Text(
                     'Cambiar',
-                    style: TextStyle(color: Colors.white), // Color de texto blanco
+                    style:
+                        TextStyle(color: Colors.white), // Color de texto blanco
                   ),
                 ),
               ],
@@ -111,7 +117,8 @@ class ProfileScreen extends StatelessWidget {
               children: <Widget>[
                 Text(
                   'Ubicación',
-                  style: TextStyle(color: Colors.white), // Color de texto blanco
+                  style:
+                      TextStyle(color: Colors.white), // Color de texto blanco
                 ),
                 TextButton(
                   onPressed: () {
@@ -119,7 +126,8 @@ class ProfileScreen extends StatelessWidget {
                   },
                   child: Text(
                     'Cambiar',
-                    style: TextStyle(color: Colors.white), // Color de texto blanco
+                    style:
+                        TextStyle(color: Colors.white), // Color de texto blanco
                   ),
                 ),
               ],
@@ -136,7 +144,8 @@ class ProfileScreen extends StatelessWidget {
               children: <Widget>[
                 Text(
                   'Contraseña',
-                  style: TextStyle(color: Colors.white), // Color de texto blanco
+                  style:
+                      TextStyle(color: Colors.white), // Color de texto blanco
                 ),
                 TextButton(
                   onPressed: () {
@@ -144,7 +153,8 @@ class ProfileScreen extends StatelessWidget {
                   },
                   child: Text(
                     'Cambiar',
-                    style: TextStyle(color: Colors.white), // Color de texto blanco
+                    style:
+                        TextStyle(color: Colors.white), // Color de texto blanco
                   ),
                 ),
               ],
@@ -161,18 +171,21 @@ class ProfileScreen extends StatelessWidget {
                 // Lógica para navegar a la pantalla de pedidos
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MyOrderScreen()), // Redirige a la pantalla de pedidos
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          MyOrderScreen()), // Redirige a la pantalla de pedidos
                 );
               },
               child: Text(
                 'Ver tu pedido',
                 style: TextStyle(
-                  color: Colors.blue, // Color de letra azul para destacar
+                  color: Color(0xFFC44949), // Color de letra #C44949
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+
             Divider(color: Colors.white), // Línea de separación blanca
 
             // Opción de Cerrar sesión
@@ -181,27 +194,32 @@ class ProfileScreen extends StatelessWidget {
                 // Lógica para cerrar sesión y navegar a la pantalla principal (main.dart)
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => MyApp()), // Asegúrate de que 'MyApp' sea el widget principal de main.dart
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          MyApp()), // Asegúrate de que 'MyApp' sea el widget principal de main.dart
                 );
               },
               child: Text(
                 'Cerrar Sesión',
                 style: TextStyle(
-                  color: Colors.black, // Color de letra negro
+                  color: Color(0xFFC44949), // Color de letra #C44949
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
             SizedBox(height: 10), // Espacio entre "Cerrar Sesión" y el nav bar
+            // Espacio entre "Cerrar Sesión" y el nav bar
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 2, // Establecer el índice actual en "Mi perfil"
-        backgroundColor: Color(0xFFEA572A), // Color de fondo del BottomNavigationBar
+        backgroundColor:
+            Color(0xFFEA572A), // Color de fondo del BottomNavigationBar
         selectedItemColor: Color(0xFF280E0E), // Color para el ítem seleccionado
-        unselectedItemColor: Colors.white, // Color de ítems no seleccionados (blanco)
+        unselectedItemColor:
+            Colors.white, // Color de ítems no seleccionados (blanco)
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
