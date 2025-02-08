@@ -57,7 +57,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           'Direccion': _direccionController.text.trim(), // Corregido (sin tilde)
           'Referencia': _referenciaController.text.trim(),
           'Ubicacion': _ubicacionJson, // Nuevo campo
-          'Rol': 'usuario', // Se asigna por defecto
+          'Rol': 'usuario', // Se asigna spor defecto
         }),
       );
 
