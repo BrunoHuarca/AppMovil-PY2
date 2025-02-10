@@ -1,10 +1,57 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'menu.dart'; // Importa la pantalla de inicio (menú)
 import 'shopping.dart'; // Importa la pantalla del carrito
 import 'main.dart'; // Importa la pantalla principal desde main.dart
 import 'myorder.dart'; // Importa la pantalla de pedidos
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'login.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String nombre = "";
+  String celular = "";
+  String direccion = "";
+  String referencia = "";
+  String ubicacion = "";
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+Future<void> _loadUserData() async {
+  final _secureStorage = FlutterSecureStorage();
+  String? userData = await _secureStorage.read(key: 'userData');
+
+  if (userData != null) {
+    final Map<String, dynamic> user = json.decode(userData);
+    setState(() {
+      nombre = user['Nombre'] ?? "Sin nombre";
+      celular = user['Celular'] ?? "Sin número";
+      direccion = user['Direccion'] ?? "Sin dirección";
+      referencia = user['Referencia'] ?? "Sin referencia";
+      ubicacion =
+          "Lat: ${user['Latitud'] ?? 'N/A'}, Long: ${user['Longitud'] ?? 'N/A'}";
+    });
+  }
+}
+
+Future<void> _logout() async {
+  final _secureStorage = FlutterSecureStorage(); // Instancia de almacenamiento seguro
+  await _secureStorage.delete(key: 'token'); // Eliminar token
+
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => LoginScreen()), // Redirigir al login
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,36 +64,31 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // Nombre
+            // Nombre del usuario
             Text(
-              'Bruno Huarca',
+              nombre,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.white, // Color de texto blanco
+                color: Colors.white,
               ),
             ),
             Row(
               children: <Widget>[
                 Text(
-                  'Celular: 902311395',
-                  style:
-                      TextStyle(color: Colors.white), // Color de texto blanco
+                  'Celular: $celular',
+                  style: TextStyle(color: Colors.white),
                 ),
                 SizedBox(width: 10),
                 TextButton(
                   onPressed: () {
                     // Acción para editar
                   },
-                  child: Text(
-                    'Editar',
-                    style:
-                        TextStyle(color: Colors.white), // Color de texto blanco
-                  ),
+                  child: Text('Editar', style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
-            Divider(color: Colors.white), // Línea de separación blanca
+            Divider(color: Colors.white),
 
             // Dirección
             Text(
@@ -54,172 +96,113 @@ class ProfileScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.white, // Color de texto blanco
+                color: Colors.white,
               ),
             ),
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
-                  'Dirección',
-                  style:
-                      TextStyle(color: Colors.white), // Color de texto blanco
-                ),
+                Text('Dirección', style: TextStyle(color: Colors.white)),
                 TextButton(
                   onPressed: () {
                     // Acción para cambiar la dirección
                   },
-                  child: Text(
-                    'Cambiar',
-                    style:
-                        TextStyle(color: Colors.white), // Color de texto blanco
-                  ),
+                  child: Text('Cambiar', style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
-            Text(
-              'C. Miramar 105',
-              style: TextStyle(color: Colors.white), // Color de texto blanco
-            ),
-            Divider(color: Colors.white), // Línea de separación blanca
+            Text(direccion, style: TextStyle(color: Colors.white)),
+            Divider(color: Colors.white),
 
             // Referencia
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
-                  'Referencia',
-                  style:
-                      TextStyle(color: Colors.white), // Color de texto blanco
-                ),
+                Text('Referencia', style: TextStyle(color: Colors.white)),
                 TextButton(
                   onPressed: () {
                     // Acción para cambiar la referencia
                   },
-                  child: Text(
-                    'Cambiar',
-                    style:
-                        TextStyle(color: Colors.white), // Color de texto blanco
-                  ),
+                  child: Text('Cambiar', style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
-            Text(
-              'Portón negro',
-              style: TextStyle(color: Colors.white), // Color de texto blanco
-            ),
-            Divider(color: Colors.white), // Línea de separación blanca
+            Text(referencia, style: TextStyle(color: Colors.white)),
+            Divider(color: Colors.white),
 
             // Ubicación
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
-                  'Ubicación',
-                  style:
-                      TextStyle(color: Colors.white), // Color de texto blanco
-                ),
+                Text('Ubicación', style: TextStyle(color: Colors.white)),
                 TextButton(
                   onPressed: () {
                     // Acción para cambiar la ubicación
                   },
-                  child: Text(
-                    'Cambiar',
-                    style:
-                        TextStyle(color: Colors.white), // Color de texto blanco
-                  ),
+                  child: Text('Cambiar', style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
-            Text(
-              'Latitud: -12.0464, Longitud: -77.0428',
-              style: TextStyle(color: Colors.white), // Color de texto blanco
-            ),
-            Divider(color: Colors.white), // Línea de separación blanca
+            Text(ubicacion, style: TextStyle(color: Colors.white)),
+            Divider(color: Colors.white),
 
-            // Contraseña (opcional)
+            // Contraseña
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
-                  'Contraseña',
-                  style:
-                      TextStyle(color: Colors.white), // Color de texto blanco
-                ),
+                Text('Contraseña', style: TextStyle(color: Colors.white)),
                 TextButton(
                   onPressed: () {
                     // Acción para cambiar la contraseña
                   },
-                  child: Text(
-                    'Cambiar',
-                    style:
-                        TextStyle(color: Colors.white), // Color de texto blanco
-                  ),
+                  child: Text('Cambiar', style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
-            Text(
-              '********', // Texto ocultando la contraseña
-              style: TextStyle(color: Colors.white), // Color de texto blanco
-            ),
-            Divider(color: Colors.white), // Línea de separación blanca
+            Text('********', style: TextStyle(color: Colors.white)),
+            Divider(color: Colors.white),
 
-            // Nuevo apartado para ver pedido
+            // Ver pedido
             GestureDetector(
               onTap: () {
-                // Lógica para navegar a la pantalla de pedidos
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          MyOrderScreen()), // Redirige a la pantalla de pedidos
+                  MaterialPageRoute(builder: (context) => MyOrderScreen()),
                 );
               },
               child: Text(
                 'Ver tu pedido',
                 style: TextStyle(
-                  color: Color(0xFFC44949), // Color de letra #C44949
+                  color: Color(0xFFC44949),
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+            Divider(color: Colors.white),
 
-            Divider(color: Colors.white), // Línea de separación blanca
-
-            // Opción de Cerrar sesión
+            // Cerrar sesión
             GestureDetector(
-              onTap: () {
-                // Lógica para cerrar sesión y navegar a la pantalla principal (main.dart)
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          MyApp()), // Asegúrate de que 'MyApp' sea el widget principal de main.dart
-                );
-              },
+              onTap: _logout,
               child: Text(
                 'Cerrar Sesión',
                 style: TextStyle(
-                  color: Color(0xFFC44949), // Color de letra #C44949
+                  color: Color(0xFFC44949),
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            SizedBox(height: 10), // Espacio entre "Cerrar Sesión" y el nav bar
-            // Espacio entre "Cerrar Sesión" y el nav bar
+            SizedBox(height: 10),
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2, // Establecer el índice actual en "Mi perfil"
-        backgroundColor:
-            Color(0xFFEA572A), // Color de fondo del BottomNavigationBar
-        selectedItemColor: Color(0xFF280E0E), // Color para el ítem seleccionado
-        unselectedItemColor:
-            Colors.white, // Color de ítems no seleccionados (blanco)
+        currentIndex: 2,
+        backgroundColor: Color(0xFFEA572A),
+        selectedItemColor: Color(0xFF280E0E),
+        unselectedItemColor: Colors.white,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -235,7 +218,6 @@ class ProfileScreen extends StatelessWidget {
           ),
         ],
         onTap: (index) {
-          // Lógica de navegación para cada opción del bottom navigation
           switch (index) {
             case 0:
               Navigator.pushReplacement(
