@@ -439,7 +439,7 @@ class PlateItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Colors.orangeAccent, // Precio en naranja
+                      color: Colors.white, // Precio en blanco
                     ),
                   ),
                 ],
