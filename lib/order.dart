@@ -22,14 +22,14 @@ class OrderScreen extends StatelessWidget {
             // Título
             Text(
               'Confirmar Pedido',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             SizedBox(height: 20),
 
             // Pregunta de cómo pagar
             Text(
               '¿Cómo quieres pagar?',
-              style: TextStyle(fontSize: 22),
+              style: TextStyle(fontSize: 22, color: Colors.white),
             ),
             SizedBox(height: 20),
 
@@ -62,13 +62,13 @@ class OrderScreen extends StatelessWidget {
                 ),
               ],
             ),
-            Divider(), // Línea de separación
+            Divider(color: Colors.white), // Línea de separación
             SizedBox(height: 20),
 
             // Datos de Entrega
             Text(
               'Datos de Entrega',
-              style: TextStyle(fontSize: 22),
+              style: TextStyle(fontSize: 22, color: Colors.white),
             ),
             SizedBox(height: 10),
 
@@ -78,17 +78,17 @@ class OrderScreen extends StatelessWidget {
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    Text('Delivery:'),
+                    Text('Delivery:', style: TextStyle(color: Colors.white)),
                     SizedBox(width: 10),
-                    Text('30-45 min'),
+                    Text('30-45 min', style: TextStyle(color: Colors.white)),
                   ],
                 ),
                 SizedBox(height: 10),
                 Row(
                   children: <Widget>[
-                    Text('Dirección:'),
+                    Text('Dirección:', style: TextStyle(color: Colors.white)),
                     SizedBox(width: 10),
-                    Text('C. Miramar 105'),
+                    Text('C. Miramar 105', style: TextStyle(color: Colors.white)),
                     SizedBox(width: 10),
                     ElevatedButton(
                       onPressed: () {},
@@ -99,9 +99,9 @@ class OrderScreen extends StatelessWidget {
                 SizedBox(height: 10),
                 Row(
                   children: <Widget>[
-                    Text('Referencia:'),
+                    Text('Referencia:', style: TextStyle(color: Colors.white)),
                     SizedBox(width: 10),
-                    Text('Porton negro'),
+                    Text('Porton negro', style: TextStyle(color: Colors.white)),
                     SizedBox(width: 10),
                     ElevatedButton(
                       onPressed: () {},
@@ -111,13 +111,13 @@ class OrderScreen extends StatelessWidget {
                 ),
               ],
             ),
-            Divider(), // Línea de separación
+            Divider(color: Colors.white), // Línea de separación
             SizedBox(height: 20),
 
             // Resumen de la compra
             Text(
               'Resumen',
-              style: TextStyle(fontSize: 22),
+              style: TextStyle(fontSize: 22, color: Colors.white),
             ),
             SizedBox(height: 10),
 
@@ -129,11 +129,11 @@ class OrderScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Subtotal:',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     Text(
                       'S/\$${subtotal.toStringAsFixed(2)}',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ],
                 ),
@@ -143,11 +143,11 @@ class OrderScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Envío:',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     Text(
                       'S/\$${shippingFee.toStringAsFixed(2)}',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ],
                 ),
@@ -158,11 +158,11 @@ class OrderScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Total:',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     Text(
                       'S/\$${totalPrice.toStringAsFixed(2)}',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ],
                 ),

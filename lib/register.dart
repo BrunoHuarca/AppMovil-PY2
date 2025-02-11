@@ -6,7 +6,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 
-
 class RegisterScreen extends StatefulWidget {
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
@@ -18,7 +17,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _direccionController = TextEditingController();
   final TextEditingController _referenciaController = TextEditingController();
-  final TextEditingController _ubicacionController = TextEditingController(); // Nuevo campo
+  final TextEditingController _ubicacionController =
+      TextEditingController(); // Nuevo campo
   String _ubicacionJson = ""; // Almacena {"lat": ..., "lng": ...}
 
   bool _isChecked = false; // Checkbox de términos y condiciones.
@@ -34,7 +34,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         !_isChecked) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Por favor, complete todos los campos y acepte los términos y condiciones'),
+          content: Text(
+              'Por favor, complete todos los campos y acepte los términos y condiciones'),
           backgroundColor: Colors.red,
         ),
       );
@@ -45,7 +46,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _isLoading = true;
     });
 
-    final String apiUrl = 'https://mixturarosaaqp.com/api/auth/register'; // URL de la API de registro
+    final String apiUrl =
+        'https://mixturarosaaqp.com/api/auth/register'; // URL de la API de registro
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -54,7 +56,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           'Numero': _numeroController.text.trim(),
           'Nombre': _nombreController.text.trim(),
           'Contraseña': _passwordController.text.trim(),
-          'Direccion': _direccionController.text.trim(), // Corregido (sin tilde)
+          'Direccion':
+              _direccionController.text.trim(), // Corregido (sin tilde)
           'Referencia': _referenciaController.text.trim(),
           'Ubicacion': _ubicacionJson, // Nuevo campo
           'Rol': 'usuario', // Se asigna spor defecto
@@ -111,88 +114,105 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Text(
-                    'Mixtura ROSA',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
                   SizedBox(height: 32.0),
-
+                  Image.asset(
+                    'assets/images/Logo-2.png', // Ruta de la imagen
+                    width: 100, // Puedes ajustar el tamaño según lo necesites
+                    height: 100,
+                  ),
                   TextField(
                     controller: _numeroController,
                     keyboardType: TextInputType.phone,
+                    style: TextStyle(color: Colors.white), // Texto blanco
                     decoration: InputDecoration(
                       labelText: 'Número',
+                      labelStyle: TextStyle(
+                          color: Colors.white), // Color del label en blanco
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.phone),
+                      prefixIcon: Icon(Icons.phone,
+                          color: Colors.white), // Icono blanco
                     ),
                   ),
                   SizedBox(height: 16.0),
-
                   TextField(
                     controller: _nombreController,
+                    style: TextStyle(color: Colors.white), // Texto blanco
                     decoration: InputDecoration(
                       labelText: 'Nombre',
+                      labelStyle: TextStyle(
+                          color: Colors.white), // Color del label en blanco
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.person),
+                      prefixIcon: Icon(Icons.person,
+                          color: Colors.white), // Icono blanco
                     ),
                   ),
                   SizedBox(height: 16.0),
-
                   TextField(
                     controller: _passwordController,
+                    style: TextStyle(color: Colors.white), // Texto blanco
                     decoration: InputDecoration(
                       labelText: 'Contraseña',
+                      labelStyle: TextStyle(
+                          color: Colors.white), // Color del label en blanco
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.lock),
+                      prefixIcon:
+                          Icon(Icons.lock, color: Colors.white), // Icono blanco
                     ),
                     obscureText: true,
                   ),
                   SizedBox(height: 16.0),
-
                   TextField(
                     controller: _direccionController,
                     maxLines: 2,
+                    style: TextStyle(color: Colors.white), // Texto blanco
                     decoration: InputDecoration(
                       labelText: 'Dirección',
+                      labelStyle: TextStyle(
+                          color: Colors.white), // Color del label en blanco
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.home),
+                      prefixIcon:
+                          Icon(Icons.home, color: Colors.white), // Icono blanco
                     ),
                   ),
                   SizedBox(height: 16.0),
-
                   TextField(
                     controller: _referenciaController,
                     maxLines: 2,
+                    style: TextStyle(color: Colors.white), // Texto blanco
                     decoration: InputDecoration(
                       labelText: 'Referencia',
+                      labelStyle: TextStyle(
+                          color: Colors.white), // Color del label en blanco
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.location_on),
+                      prefixIcon: Icon(Icons.location_on,
+                          color: Colors.white), // Icono blanco
                     ),
                   ),
                   SizedBox(height: 16.0),
-
                   TextField(
                     controller: _ubicacionController,
                     readOnly: true,
+                    style: TextStyle(color: Colors.white), // Texto blanco
                     decoration: InputDecoration(
                       labelText: 'Ubicación',
+                      labelStyle: TextStyle(
+                          color: Colors.white), // Color del label en blanco
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.map),
+                      prefixIcon:
+                          Icon(Icons.map, color: Colors.white), // Icono blanco
                       suffixIcon: IconButton(
-                        icon: Icon(Icons.location_searching),
+                        icon: Icon(Icons.location_searching,
+                            color: Colors.white), // Icono blanco
                         onPressed: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => MapScreen(
                                 onLocationSelected: (locationJson, address) {
                                   setState(() {
-                                    _ubicacionController.text = address; // Muestra la dirección
-                                    _ubicacionJson = locationJson; // Guarda {"lat": ..., "lng": ...}
+                                    _ubicacionController.text =
+                                        address; // Muestra la dirección
+                                    _ubicacionJson =
+                                        locationJson; // Guarda {"lat": ..., "lng": ...}
                                   });
                                 },
                               ),
@@ -202,9 +222,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
-
                   SizedBox(height: 16.0),
-
                   Row(
                     children: <Widget>[
                       Checkbox(
@@ -218,39 +236,56 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Expanded(
                         child: Text(
                           'He leído y acepto los términos y condiciones de uso',
-                          style: TextStyle(fontSize: 14),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white, // Texto blanco
+                          ),
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: 16.0),
-
                   _isLoading
                       ? Center(child: CircularProgressIndicator())
                       : ElevatedButton(
                           onPressed: _register,
-                          child: Text('Registrarse'),
+                          child: Text(
+                            'Registrarse',
+                            style: TextStyle(
+                              color: Colors.white, // Letras de color blanco
+                            ),
+                          ),
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(vertical: 16.0),
                             textStyle: TextStyle(fontSize: 18),
+                            backgroundColor:
+                                Color(0xFFEA572A), // Color del botón #EA572A
                           ),
                         ),
                   SizedBox(height: 16.0),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text('¿Ya tienes una cuenta?'),
+                      Text(
+                        '¿Ya tienes una cuenta?',
+                        style: TextStyle(
+                          color: Colors.white, // Texto de color blanco
+                        ),
+                      ),
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (context) => LoginScreen()),
+                            MaterialPageRoute(
+                                builder: (context) => LoginScreen()),
                           );
                         },
                         child: Text(
                           'Ingresar',
                           style: TextStyle(
-                              color: Colors.blue, decoration: TextDecoration.underline),
+                            color: Color(
+                                0xFFEA572A), // Color del texto 'Ingresar' #EA572A
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                       ),
                     ],
@@ -264,7 +299,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
-
 
 class MapScreen extends StatefulWidget {
   final Function(String, String) onLocationSelected;
@@ -378,11 +412,13 @@ class _MapScreenState extends State<MapScreen> {
                     minZoom: 3.0,
                     maxZoom: 18.0,
                     onTap: (tapPosition, latlng) => _onTap(latlng),
-                    interactiveFlags: InteractiveFlag.all, // 🔥 Habilita zoom con pellizco
+                    interactiveFlags:
+                        InteractiveFlag.all, // 🔥 Habilita zoom con pellizco
                   ),
                   children: [
                     TileLayer(
-                      urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                      urlTemplate:
+                          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                       subdomains: ['a', 'b', 'c'],
                     ),
                     if (selectedLocation != null)
@@ -392,14 +428,13 @@ class _MapScreenState extends State<MapScreen> {
                             width: 40.0,
                             height: 40.0,
                             point: selectedLocation!,
-                            builder: (context) =>
-                                Icon(Icons.location_pin, color: Colors.red, size: 40),
+                            builder: (context) => Icon(Icons.location_pin,
+                                color: Colors.red, size: 40),
                           ),
                         ],
                       ),
                   ],
                 ),
-
                 Positioned(
                   top: 10,
                   right: 10,
@@ -409,7 +444,8 @@ class _MapScreenState extends State<MapScreen> {
                         mini: true,
                         child: Icon(Icons.zoom_in),
                         onPressed: () {
-                          _mapController.move(_mapController.center, _mapController.zoom + 1);
+                          _mapController.move(
+                              _mapController.center, _mapController.zoom + 1);
                         },
                       ),
                       SizedBox(height: 8),
@@ -417,7 +453,8 @@ class _MapScreenState extends State<MapScreen> {
                         mini: true,
                         child: Icon(Icons.zoom_out),
                         onPressed: () {
-                          _mapController.move(_mapController.center, _mapController.zoom - 1);
+                          _mapController.move(
+                              _mapController.center, _mapController.zoom - 1);
                         },
                       ),
                     ],
@@ -426,7 +463,6 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
           ),
-
         ],
       ),
       floatingActionButton: FloatingActionButton(
