@@ -214,119 +214,119 @@ class _MenuScreenState extends State<MenuScreen> {
 
             // Texto 'Las Mejores Ofertas'
 // Sección "Las Mejores Ofertas"
-Padding(
-  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-  child: Align(
-    alignment: Alignment.centerLeft,
-    child: Text(
-      'Las Mejores Ofertas',
-      style: TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-    ),
-  ),
-),
+// Padding(
+//   padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+//   child: Align(
+//     alignment: Alignment.centerLeft,
+//     child: Text(
+//       'Las Mejores Ofertas',
+//       style: TextStyle(
+//         fontSize: 18,
+//         fontWeight: FontWeight.bold,
+//         color: Colors.white,
+//       ),
+//     ),
+//   ),
+// ),
 
 // Carrusel de productos en oferta
 // Carrusel de productos en oferta
-isBestLoading
-    ? Center(child: CircularProgressIndicator())
-    : bestProducts.isEmpty
-        ? Center(
-            child: Text(
-              "No hay productos en oferta",
-              style: TextStyle(color: Colors.white),
-            ),
-          )
-        : Container(
-            height: MediaQuery.of(context).size.width * 0.5 + 40,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: bestProducts.length,
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              itemBuilder: (context, index) {
-                Product product = bestProducts[index];
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProductScreen(product: product),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.75,
-                    margin: EdgeInsets.only(right: 16.0),
-                    child: Card(
-                      color: Colors.transparent, // Hacer la tarjeta transparente
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(12.0)),
-                            child: Image.network(
-                              product.imageUrl ?? '',
-                              height: MediaQuery.of(context).size.width * 0.4, // Reduje el tamaño
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      product.name ?? 'Producto sin nombre',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white, // Color blanco
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.access_time,
-                                            size: 14, color: Colors.white),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          '30-45 MIN',
-                                          style: TextStyle(
-                                              fontSize: 12, color: Colors.white),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Text(
-                                  'S/. ${product.price ?? '0.00'}',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white, // Texto en blanco
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+// isBestLoading
+//     ? Center(child: CircularProgressIndicator())
+//     : bestProducts.isEmpty
+//         ? Center(
+//             child: Text(
+//               "No hay productos en oferta",
+//               style: TextStyle(color: Colors.white),
+//             ),
+//           )
+//         : Container(
+//             height: MediaQuery.of(context).size.width * 0.5 + 40,
+//             child: ListView.builder(
+//               scrollDirection: Axis.horizontal,
+//               itemCount: bestProducts.length,
+//               padding: EdgeInsets.symmetric(horizontal: 16.0),
+//               itemBuilder: (context, index) {
+//                 Product product = bestProducts[index];
+//                 return GestureDetector(
+//                   onTap: () {
+//                     Navigator.push(
+//                       context,
+//                       MaterialPageRoute(
+//                         builder: (context) => ProductScreen(product: product),
+//                       ),
+//                     );
+//                   },
+//                   child: Container(
+//                     width: MediaQuery.of(context).size.width * 0.75,
+//                     margin: EdgeInsets.only(right: 16.0),
+//                     child: Card(
+//                       color: Colors.transparent, // Hacer la tarjeta transparente
+//                       shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.circular(12.0),
+//                       ),
+//                       child: Column(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           ClipRRect(
+//                             borderRadius:
+//                                 BorderRadius.vertical(top: Radius.circular(12.0)),
+//                             child: Image.network(
+//                               product.imageUrl ?? '',
+//                               height: MediaQuery.of(context).size.width * 0.4, // Reduje el tamaño
+//                               width: double.infinity,
+//                               fit: BoxFit.cover,
+//                             ),
+//                           ),
+//                           Padding(
+//                             padding: const EdgeInsets.all(8.0),
+//                             child: Row(
+//                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                               children: [
+//                                 Column(
+//                                   crossAxisAlignment: CrossAxisAlignment.start,
+//                                   children: [
+//                                     Text(
+//                                       product.name ?? 'Producto sin nombre',
+//                                       style: TextStyle(
+//                                         fontSize: 14,
+//                                         fontWeight: FontWeight.bold,
+//                                         color: Colors.white, // Color blanco
+//                                       ),
+//                                     ),
+//                                     Row(
+//                                       children: [
+//                                         Icon(Icons.access_time,
+//                                             size: 14, color: Colors.white),
+//                                         SizedBox(width: 4),
+//                                         Text(
+//                                           '30-45 MIN',
+//                                           style: TextStyle(
+//                                               fontSize: 12, color: Colors.white),
+//                                         ),
+//                                       ],
+//                                     ),
+//                                   ],
+//                                 ),
+//                                 Text(
+//                                   'S/. ${product.price ?? '0.00'}',
+//                                   style: TextStyle(
+//                                     fontSize: 14,
+//                                     color: Colors.white, // Texto en blanco
+//                                     fontWeight: FontWeight.bold,
+//                                   ),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ),
+//                 );
+//               },
+//             ),
+//           ),
 
 
 
