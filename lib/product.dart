@@ -10,7 +10,7 @@ class ProductScreen extends StatefulWidget {
   @override
   _ProductScreenState createState() => _ProductScreenState();
 }
-
+//comentario
 class _ProductScreenState extends State<ProductScreen> {
   int selectedQuantity = 1; // Cantidad mínima inicial
 

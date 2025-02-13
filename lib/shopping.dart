@@ -8,7 +8,7 @@ class ShoppingScreen extends StatefulWidget {
   @override
   _ShoppingScreenState createState() => _ShoppingScreenState();
 }
-
+//comentario
 class _ShoppingScreenState extends State<ShoppingScreen> {
   // Función que calcula el subtotal sumando el precio por cantidad de cada producto
   double get subtotal {
