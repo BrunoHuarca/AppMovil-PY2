@@ -14,6 +14,9 @@ class MenuScreen extends StatefulWidget {
 class _MenuScreenState extends State<MenuScreen> {
   List<Product> products = []; // Lista de productos
   List<Product> filteredProducts = []; // Lista filtrada de productos
+  List<Product> bestProducts = []; // Lista de mejores productos
+  bool isBestLoading = true; // Estado de carga para mejores productos
+
   bool isLoading = true;
   TextEditingController searchController = TextEditingController();
   int _selectedIndex =
@@ -23,6 +26,7 @@ class _MenuScreenState extends State<MenuScreen> {
   void initState() {
     super.initState();
     fetchProducts();
+      fetchBestProducts(); // Cargar los mejores productos
     searchController.addListener(_filterProducts);
   }
 
@@ -30,7 +34,7 @@ class _MenuScreenState extends State<MenuScreen> {
   Future<void> fetchProducts() async {
     try {
       final response =
-          await http.get(Uri.parse('https://mixturarosaaqp.com/api/productos'));
+          await http.get(Uri.parse('https://mixturarosaaqp.com/api/productos/categoria/1'));
 
       if (response.statusCode == 200) {
         // Si la solicitud fue exitosa, parsea los productos
@@ -70,6 +74,28 @@ class _MenuScreenState extends State<MenuScreen> {
           );
         },
       );
+    }
+  }
+  Future<void> fetchBestProducts() async {
+    try {
+      final response = await http.get(Uri.parse('https://mixturarosaaqp.com/api/productos/categoria/3'));
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          bestProducts = data.map((item) => Product.fromJson(item)).toList();
+          isBestLoading = false;
+        });
+      } else {
+        setState(() {
+          isBestLoading = false;
+        });
+        throw Exception('Error al cargar los mejores productos');
+      }
+    } catch (error) {
+      setState(() {
+        isBestLoading = false;
+      });
     }
   }
 
@@ -118,9 +144,9 @@ class _MenuScreenState extends State<MenuScreen> {
         child: Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(top:50.0, left: 16.0, bottom: 16.0, right: 16.0),
               child: Text(
-                'RESTAURANT',
+                'MIXTURA ROSA',
                 style: TextStyle(
                   fontSize: 18, // Tamaño de texto más pequeño
                   fontWeight: FontWeight.bold,
@@ -138,82 +164,172 @@ class _MenuScreenState extends State<MenuScreen> {
                 decoration: InputDecoration(
                   labelText: 'Buscar plato...',
                   labelStyle: TextStyle(
-                    color: Colors.white, // Color blanco para el placeholder
+                    color: Colors.grey[700], // Color gris oscuro para el placeholder
                   ),
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(
-                    Icons.search,
-                    color: Color(
-                        0xFFEA572A), // Color #EA572A para el ícono de la lupa
+                  filled: true, // Fondo activado
+                  fillColor: Colors.white, // Fondo blanco
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0), // Bordes redondeados
+                    borderSide: BorderSide.none, // Sin borde exterior
+                  ),
+                  contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0), // Padding interno
+                  suffixIcon: Padding(
+                    padding: EdgeInsets.only(right: 10.0), // Más espacio a la derecha
+                    child: Icon(
+                      Icons.search,
+                      color: Color(0xFFEA572A), // Ícono en color naranja
+                    ),
                   ),
                 ),
                 style: TextStyle(
-                    color: Colors.white), // Texto ingresado también en blanco
+                  color: Colors.black, // Texto ingresado en negro
+                ),
               ),
             ),
 
             // Botón 'Licorería'
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  // Aquí puedes agregar una acción cuando se presione el botón
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFEA572A), // Color de fondo #EA572A
-                  foregroundColor: Colors.white, // Color del texto blanco
-                  minimumSize: Size(200, 60), // Ancho y alto mínimos del botón
-                  padding: EdgeInsets.symmetric(
-                      vertical: 16.0,
-                      horizontal: 32.0), // Ajustar el padding interno
-                ),
-                child: Text(
-                  'Licorería',
-                  style:
-                      TextStyle(fontSize: 20), // Tamaño de la fuente del texto
+              child: SizedBox(
+                width: double.infinity, // Ocupa todo el ancho disponible
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Acción al presionar el botón
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFEA572A), // Color de fondo #EA572A
+                    foregroundColor: Colors.white, // Color del texto blanco
+                    padding: EdgeInsets.symmetric(vertical: 16.0), // Ajuste del padding
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0), // Bordes redondeados de 10
+                    ),
+                  ),
+                  child: Text(
+                    'Licorería',
+                    style: TextStyle(fontSize: 20), // Tamaño del texto
+                  ),
                 ),
               ),
             ),
 
             // Texto 'Las Mejores Ofertas'
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                  vertical: 16.0,
-                  horizontal: 8.0), // Agregar padding horizontal
-              child: Align(
-                alignment:
-                    Alignment.centerLeft, // Alinear el texto a la izquierda
-                child: Text(
-                  'Las Mejores Ofertas',
-                  style: TextStyle(
-                    fontSize: 18, // Reducir el tamaño del texto
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white, // Color blanco
-                  ),
-                ),
-              ),
-            ),
+// Sección "Las Mejores Ofertas"
+Padding(
+  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+  child: Align(
+    alignment: Alignment.centerLeft,
+    child: Text(
+      'Las Mejores Ofertas',
+      style: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+    ),
+  ),
+),
 
-            // PageView de imágenes
-            isLoading
-                ? Center(child: CircularProgressIndicator())
-                : Container(
-                    height: 250, // Altura de la vista de las imágenes
-                    child: PageView.builder(
-                      itemCount:
-                          3, // Cambiar el número según la cantidad de imágenes
-                      itemBuilder: (context, index) {
-                        return Image.network(
-                          'https://via.placeholder.com/600x400', // Imagen de ejemplo
-                          fit: BoxFit.cover,
-                          width: MediaQuery.of(context).size.width,
-                        );
-                      },
-                      onPageChanged: (index) {
-                        // Aquí puedes hacer algo cuando cambie la página
-                      },
+// Carrusel de productos en oferta
+// Carrusel de productos en oferta
+isBestLoading
+    ? Center(child: CircularProgressIndicator())
+    : bestProducts.isEmpty
+        ? Center(
+            child: Text(
+              "No hay productos en oferta",
+              style: TextStyle(color: Colors.white),
+            ),
+          )
+        : Container(
+            height: MediaQuery.of(context).size.width * 0.5 + 40,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: bestProducts.length,
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              itemBuilder: (context, index) {
+                Product product = bestProducts[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProductScreen(product: product),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.75,
+                    margin: EdgeInsets.only(right: 16.0),
+                    child: Card(
+                      color: Colors.transparent, // Hacer la tarjeta transparente
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(12.0)),
+                            child: Image.network(
+                              product.imageUrl ?? '',
+                              height: MediaQuery.of(context).size.width * 0.4, // Reduje el tamaño
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      product.name ?? 'Producto sin nombre',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white, // Color blanco
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.access_time,
+                                            size: 14, color: Colors.white),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          '30-45 MIN',
+                                          style: TextStyle(
+                                              fontSize: 12, color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  'S/. ${product.price ?? '0.00'}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white, // Texto en blanco
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                );
+              },
+            ),
+          ),
+
+
+
             // Título 'Todos los platos'
             Padding(
               padding: const EdgeInsets.symmetric(
@@ -282,7 +398,6 @@ class PlateItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navegar a la pantalla de detalles del producto
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -290,49 +405,71 @@ class PlateItem extends StatelessWidget {
           ),
         );
       },
-      child: Card(
-        margin: EdgeInsets.symmetric(vertical: 8.0),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: <Widget>[
-              Image.network(
-                product.imageUrl ?? '',
-                height: 60.0,
-                width: 60.0,
-                fit: BoxFit.cover,
-                loadingBuilder: (BuildContext context, Widget child,
-                    ImageChunkEvent? loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                (loadingProgress.expectedTotalBytes ?? 1)
-                            : null,
-                      ),
-                    );
-                  }
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(Icons.error, size: 60.0);
-                },
-              ),
-              SizedBox(width: 16.0),
-              Column(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        child: Row(
+          children: <Widget>[
+            // Información del producto (Nombre, Descripción y Precio) - A la izquierda
+            Expanded(
+              flex: 60, // 60% del ancho para el texto
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
                     product.name ?? 'Nombre no disponible',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white, // Texto en blanco
+                    ),
                   ),
-                  Text('S/${product.price ?? 'Precio no disponible'}'),
+                  SizedBox(height: 4),
+                  Text(
+                    product.description ?? 'Sin descripción',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white70, // Texto en blanco con opacidad
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    'S/. ${product.price ?? '0.00'}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white, // Precio en blanco
+                    ),
+                  ),
                 ],
               ),
-            ],
-          ),
+            ),
+
+            // Imagen del producto - A la derecha
+            SizedBox(width: 8), // Espaciado entre el texto y la imagen
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0), // Bordes redondeados
+              child: Image.network(
+                product.imageUrl ?? '',
+                width: MediaQuery.of(context).size.width * 0.40, // 40% del ancho
+                height: MediaQuery.of(context).size.width * 0.3, // Ajuste proporcional
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.error, size: 60.0, color: Colors.red);
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

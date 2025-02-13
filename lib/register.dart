@@ -5,6 +5,7 @@ import 'main.dart'; // Para volver a la pantalla principal después de registrar
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'login.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
