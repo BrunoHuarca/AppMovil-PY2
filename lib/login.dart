@@ -122,61 +122,70 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 32.0),
               TextField(
-              controller: _numeroController,
-              decoration: InputDecoration(
-                labelText: 'Nombre',
-                labelStyle: TextStyle(color: Colors.white),
-                hintText: 'Ingresa tu nombre',
-                hintStyle: TextStyle(color: Colors.white),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFEA572A)), // Borde en #EA572A
+                controller: _numeroController,
+                decoration: InputDecoration(
+                  labelText: 'Nombre',
+                  labelStyle: TextStyle(color: Colors.white),
+                  hintText: 'Ingresa tu nombre',
+                  hintStyle: TextStyle(color: Colors.white),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0), // Bordes redondeados
+                    borderSide: BorderSide(color: Color(0xFFEA572A)), // Borde en #EA572A
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0), // Bordes redondeados
+                    borderSide: BorderSide(color: Color(0xFFEA572A), width: 2.0), // Borde más grueso al enfocar
+                  ),
+                  prefixIcon: Icon(Icons.person, color: Colors.white),
+                  filled: true,
+                  fillColor: Colors.transparent,
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFEA572A), width: 2.0), // Borde más grueso al enfocar
-                ),
-                prefixIcon: Icon(Icons.person, color: Colors.white),
-                filled: true,
-                fillColor: Colors.transparent,
+                style: TextStyle(color: Colors.white),
               ),
-              style: TextStyle(color: Colors.white),
-            ),
 
-            SizedBox(height: 16.0),
+              SizedBox(height: 16.0),
 
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Contraseña',
-                labelStyle: TextStyle(color: Colors.white),
-                hintText: 'Ingresa tu contraseña',
-                hintStyle: TextStyle(color: Colors.white),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFEA572A)), // Borde en #EA572A
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Contraseña',
+                  labelStyle: TextStyle(color: Colors.white),
+                  hintText: 'Ingresa tu contraseña',
+                  hintStyle: TextStyle(color: Colors.white),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0), // Bordes redondeados
+                    borderSide: BorderSide(color: Color(0xFFEA572A)), // Borde en #EA572A
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0), // Bordes redondeados
+                    borderSide: BorderSide(color: Color(0xFFEA572A), width: 2.0), // Borde más grueso al enfocar
+                  ),
+                  prefixIcon: Icon(Icons.lock, color: Colors.white),
+                  filled: true,
+                  fillColor: Colors.transparent,
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFEA572A), width: 2.0), // Borde más grueso al enfocar
-                ),
-                prefixIcon: Icon(Icons.lock, color: Colors.white),
-                filled: true,
-                fillColor: Colors.transparent,
+                style: TextStyle(color: Colors.white),
               ),
-              style: TextStyle(color: Colors.white),
-            ),
+
 
               SizedBox(height: 32.0),
               _isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : ElevatedButton(
-                      onPressed: _login,
-                      child: Text('Iniciar sesión'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFEA572A),
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 16.0),
-                        textStyle: TextStyle(fontSize: 18),
+                ? Center(child: CircularProgressIndicator())
+                : ElevatedButton(
+                    onPressed: _login,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFEA572A), // Fondo naranja
+                      foregroundColor: Colors.white, // Texto blanco
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      textStyle: TextStyle(fontSize: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0), // Bordes redondeados
                       ),
                     ),
+                    child: Text('Iniciar sesión'),
+                  ),
+
               SizedBox(height: 16.0),
               Text(
                 '¿Aún no tienes cuenta?',
